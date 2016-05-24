@@ -10,12 +10,14 @@ namespace SampleWebsite
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery")
                 .Include("~/Scripts/jquery-{version}.js")
+                .Include("~/Scripts/jquery.signalR-{version}.js")
                 // Include the generated enums, actions and service caller files!
                 .Include("~/Scripts/app/server/servicecaller.js")
                 .Include("~/Scripts/app/server/enums.js")
                 .Include("~/Scripts/app/server/actions.js")
                 // The main app file
                 .Include("~/Scripts/app/app.js")
+                .Include("~/Scripts/app/PersonHub.js")
                 );
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
