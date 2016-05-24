@@ -1,0 +1,10 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TsGenInputAssembly>..\SampleWebsite.Models\bin\$(Configuration)\SampleWebsite.Models.dll</TsGenInputAssembly>
+    <TsGenOutputFolder>scripts\server</TsGenOutputFolder>
+    <TsGenWebApiMethods>true</TsGenWebApiMethods>
+    <TsGenDebug>false</TsGenDebug>
+  </PropertyGroup>
+
+</Project>
