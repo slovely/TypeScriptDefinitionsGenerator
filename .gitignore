@@ -234,3 +234,7 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# Sample app generated Javascript files
+/src/SampleWebsite/Scripts/App/**/*.js
+/src/SampleWebsite/Scripts/App/**/*.js.map

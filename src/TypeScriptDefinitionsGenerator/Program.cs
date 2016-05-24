@@ -185,6 +185,17 @@ namespace TypeScriptDefinitionsGenerator
             output.Append("}");
 
             File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
+
+            if (options.UseDefaultServiceCaller)
+            {
+                // Write the default service caller
+                using (var stream = typeof(Program).Assembly.GetManifestResourceStream(typeof(Program).Namespace + ".Resources.ServiceCaller.ts"))
+                using (var reader = new StreamReader(stream))
+                {
+                    File.WriteAllText(Path.Combine(options.OutputFilePath, "servicecaller.ts"), reader.ReadToEnd());
+                }
+            }
+
         }
 
         private static string GetQueryStringParameters(List<ActionParameterInfo> actionParameters)

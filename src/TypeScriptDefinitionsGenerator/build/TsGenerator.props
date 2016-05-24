@@ -9,6 +9,8 @@
     <TsGenWebApiMethods>true</TsGenWebApiMethods>
     <!-- true/false - allows debugging of the generation -->
     <TsGenDebug>false</TsGenDebug>
+    <!-- Set to false to use your own service caller -->
+    <TsGenUseDefaultServiceCaller>true</TsGenUseDefaultServiceCaller>
   </PropertyGroup>
 
 </Project>

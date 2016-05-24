@@ -169,9 +169,11 @@
     <Content Include="TsGenerator.props" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\server\actions.ts" />
-    <TypeScriptCompile Include="Scripts\server\classes.d.ts" />
-    <TypeScriptCompile Include="Scripts\server\enums.ts" />
+    <TypeScriptCompile Include="Scripts\App\app.ts" />
+    <TypeScriptCompile Include="Scripts\App\server\actions.ts" />
+    <TypeScriptCompile Include="Scripts\App\server\classes.d.ts" />
+    <TypeScriptCompile Include="Scripts\App\server\enums.ts" />
+    <TypeScriptCompile Include="Scripts\App\server\servicecaller.ts" />
     <TypeScriptCompile Include="Scripts\Typings\jquery\jquery.d.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +185,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SampleWebsite.Models\SampleWebsite.Models.csproj">
+      <Project>{9f338fe9-45c5-432a-93ab-8827402747ba}</Project>
+      <Name>SampleWebsite.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -2,10 +2,10 @@
 {
     public enum Gender
     {
-        Male,
-        Female,
         None,
         PreferNotToSay,
         Other,
+        Male,
+        Female,
     }
 }

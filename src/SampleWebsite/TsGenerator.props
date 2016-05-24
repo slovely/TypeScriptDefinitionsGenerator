@@ -1,10 +1,16 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
+    <!-- Specify a path to the DLL containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
     <TsGenInputAssembly>..\SampleWebsite.Models\bin\$(Configuration)\SampleWebsite.Models.dll</TsGenInputAssembly>
-    <TsGenOutputFolder>scripts\server</TsGenOutputFolder>
+    <!-- Specify the path to output the generated TypeScript (relative to the current project directory) -->
+    <TsGenOutputFolder>scripts\app\server</TsGenOutputFolder>
+    <!-- true/false - indicates whether WebApi action methods should be generated -->
     <TsGenWebApiMethods>true</TsGenWebApiMethods>
+    <!-- true/false - allows debugging of the generation -->
     <TsGenDebug>false</TsGenDebug>
+    <!-- Set to false to use your own service caller -->
+    <TsGenUseDefaultServiceCaller>true</TsGenUseDefaultServiceCaller>
   </PropertyGroup>
 
 </Project>
