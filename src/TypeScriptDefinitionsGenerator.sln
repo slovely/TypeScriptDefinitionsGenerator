@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Kelly|Any CPU = Kelly|Any CPU
+		Release|Any CPU = Release|Any CPU
+		WorkforceXL|Any CPU = WorkforceXL|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Kelly|Any CPU.ActiveCfg = Kelly|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Kelly|Any CPU.Build.0 = Kelly|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.WorkforceXL|Any CPU.ActiveCfg = WorkforceXL|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.WorkforceXL|Any CPU.Build.0 = WorkforceXL|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
