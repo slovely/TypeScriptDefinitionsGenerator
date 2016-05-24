@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>TypeScriptDefinitionsGenerator</id>
+        <version>1.0.0</version>
+        <title>TypeScriptDefinitionsGenerator</title>
+        <authors>Simon Lovely</authors>
+        <owners>Simon Lovely</owners>
+        <licenseUrl>https://github.com/slovely/TypeScriptDefinitionsGenerator/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/slovely/TypeScriptDefinitionsGenerator</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Generate type-safe TS definitions for your C# code</description>
+        <releaseNotes />
+        <copyright>Copyright 2016</copyright>
+        <tags>TypeScript Generation TypeLite</tags>
+    </metadata>
+    <files>
+        <file src="bin\Debug\CommandLine.dll" target="build\net45\CommandLine.dll" />
+        <file src="bin\Debug\Microsoft.AspNet.SignalR.Core.dll" target="build\net45\Microsoft.AspNet.SignalR.Core.dll" />
+        <file src="bin\Debug\Microsoft.Owin.dll" target="build\net45\Microsoft.Owin.dll" />
+        <file src="bin\Debug\Microsoft.Owin.Security.dll" target="build\net45\Microsoft.Owin.Security.dll" />
+        <file src="bin\Debug\Newtonsoft.Json.dll" target="build\net45\Newtonsoft.Json.dll" />
+        <file src="bin\Debug\Owin.dll" target="build\net45\Owin.dll" />
+        <file src="bin\Debug\System.Net.Http.Formatting.dll" target="build\net45\System.Net.Http.Formatting.dll" />
+        <file src="bin\Debug\System.Web.Http.dll" target="build\net45\System.Web.Http.dll" />
+        <file src="bin\Debug\TypeLite.dll" target="build\net45\TypeLite.dll" />
+        <file src="bin\Debug\TypeLite.Net4.dll" target="build\net45\TypeLite.Net4.dll" />
+        <file src="bin\Debug\TypeScriptDefinitionsGenerator.exe" target="build\net45\TypeScriptDefinitionsGenerator.exe" />
+        <file src="build\TypeScriptDefinitionsGenerator.targets" target="build\net45\TypeScriptDefinitionsGenerator.targets" />
+        <file src="build\TsGenerator.props" target="content\TsGenerator.props" />
+    </files>
+</package>

@@ -31,7 +31,7 @@ namespace TypeScriptDefinitionsGenerator
                 if (options.AttachDebugger)
                 {
                     Debugger.Launch();
-                    Debugger.Break(); 
+                    Debugger.Break();
                 }
                 Directory.CreateDirectory(options.OutputFilePath);
                 LoadReferencedAssemblies(options.Assembly);

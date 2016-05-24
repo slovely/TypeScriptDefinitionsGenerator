@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TypeScriptDefinitionsGenerator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Generate type-safe TS definitions for your C# code")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Simon Lovely")]
 [assembly: AssemblyProduct("TypeScriptDefinitionsGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
