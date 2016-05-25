@@ -1,3 +1,7 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/qee4nv3ta5ubyyik?svg=true)](https://ci.appveyor.com/project/slovely/typescriptdefinitionsgenerator/branch/master)
+[![Nuget](https://img.shields.io/nuget/v/TypeScriptDefinitionsGenerator.svg)](https://www.nuget.org/packages/TypeScriptDefinitionsGenerator/)
+
+
 # TypeScriptDefinitionsGenerator
 This is a solution enabling TypeScript definitions of your server-side code to be generated quickly and automatically on each build.  Ensures that renaming a class/property on the server doesn't break your client-side code at runtime.  
 Supports WebAPI and SignalR method return/parameter types automatically, or tell it where the classes you want to convert are and it'll do them.
@@ -26,6 +30,8 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
 4 - Include the generated files in your project and ensure `enums.ts` and `actions.ts` are output into your HTML (e.g. include in your BundleConfig).
 
 5 - The default generation of WebAPI methods requires JQuery to be present, as it using `$.ajax` for calling the server.
+
+[![](
 
 ##### TsGenerator.props Options
  - TsGenInputAssembly [Required] - enter the assembly containing your webapi controllers/signalr hubs/other models here.  The Path is relative to the WebSite Project Directory.
