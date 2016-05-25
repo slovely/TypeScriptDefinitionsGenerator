@@ -72,6 +72,9 @@
     <Compile Include="Gender.cs" />
     <Compile Include="Hubs\PersonHub.cs" />
     <Compile Include="Hubs\TimeHub.cs" />
+    <Compile Include="OtherModelsWeWantToConvert\SubFolder\AnotherType.cs" />
+    <Compile Include="OtherModelsWeWantToConvert\SubFolder\GenericType.cs" />
+    <Compile Include="OtherModelsWeWantToConvert\WillBeConvertedEvenThoughNotUsed.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
