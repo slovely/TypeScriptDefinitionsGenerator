@@ -1,14 +1,59 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
 
   <Import Project="$(ProjectDir)TsGenerator.props" />
+
+  <!--Simple inline task to create -n [ns1] [ns2]...[nsN] namespaces parameter-->
+  <UsingTask
+    TaskName="CreateNamespacesParameter"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <Namespaces Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <Parameter Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs">
+        <![CDATA[
+            using System;
+            using System.Linq;
+            using Microsoft.Build.Framework;
+            using Microsoft.Build.Utilities;
+
+            public class CreateNamespacesParameter : Task
+            {  
+                public ITaskItem[] Namespaces { get; set; }
+                
+                [Output]
+                public string Parameter { get; set; }
+
+                public override bool Execute()
+                {
+                    Parameter = "";
+                    
+                    if (Namespaces == null || !Namespaces.Any()) return true;
+                
+                    Parameter = "-n ";
+                    Parameter += string.Join(",", Namespaces.Where(n => !string.IsNullOrWhiteSpace(n.ItemSpec)).Select(n => n.ItemSpec));
+                    return true;
+                }
+            }
+
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
   
   <Target Name="AfterResolveReferences">
 
+    <CreateNamespacesParameter Namespaces="@(TsNamespaces)">
+      <Output TaskParameter="Parameter" PropertyName="NamespacesParam"></Output>
+    </CreateNamespacesParameter>
+    
     <PropertyGroup>
       <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; -a $(TsGenInputAssembly) -o $(TsGenOutputFolder) $(WebApiParam) $(DebugParam)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; -a $(TsGenInputAssembly) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>

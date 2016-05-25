@@ -64,9 +64,6 @@ namespace TypeScriptDefinitionsGenerator
 
         private static void GenerateTypeScriptContracts(Options options)
         {
-            //Add breakpoints, then uncomment these lines to enable debugging
-            //Debugger.Launch();
-            //Debugger.Break(); 
             var assembly = Assembly.LoadFrom(options.Assembly);
             Console.WriteLine("Loaded assembly");
 
@@ -105,7 +102,7 @@ namespace TypeScriptDefinitionsGenerator
             if (options.Namespaces != null && options.Namespaces.Any())
             {
                 var types = assembly.GetTypes()
-                    .Where(t => options.Namespaces.Any(n => (t.Namespace ?? "") == n));
+                    .Where(t => options.Namespaces.Any(n => (t.Namespace ?? "").StartsWith(n)));
                 ProcessTypes(types, generator);
             }
             

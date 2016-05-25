@@ -13,4 +13,9 @@
     <TsGenUseDefaultServiceCaller>true</TsGenUseDefaultServiceCaller>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Add namespaces here to also include them in the generation - useful if they are used from MVC or (shudder) WebForms requests which the generator can't determine itself -->
+    <!--<TsNamespaces Include=""></TsNamespaces>-->
+  </ItemGroup>
+
 </Project>
