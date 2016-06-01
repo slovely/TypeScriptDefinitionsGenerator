@@ -1,12 +1,19 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
 
   <Import Project="$(ProjectDir)TsGenerator.props" />
+  
+  <PropertyGroup>
+    <!-- The assembly containing inline task support is different in VS 2013 and 2015. -->
+    <InlineTasksAssemblyFile Condition="'$(MSBuildToolsVersion)' == '14.0'">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</InlineTasksAssemblyFile>
+    <InlineTasksAssemblyFile Condition="'$(MSBuildToolsVersion)' != '14.0'">$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll</InlineTasksAssemblyFile>
+  </PropertyGroup>
 
   <!--Simple inline task to create -n [ns1] [ns2]...[nsN] namespaces parameter-->
   <UsingTask
     TaskName="CreateNamespacesParameter"
     TaskFactory="CodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    AssemblyFile="$(InlineTasksAssemblyFile)"
+    >
     <ParameterGroup>
       <Namespaces Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
       <Parameter Output="true" ParameterType="System.String" />
