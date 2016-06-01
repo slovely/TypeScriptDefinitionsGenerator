@@ -13,7 +13,7 @@ namespace TypeScriptDefinitionsGenerator.SignalR
         public string GenerateHubs(Assembly assembly)
         {
             var hubs = assembly.GetTypes()
-                .Where(t => t.BaseType != null && t.BaseType.FullName.Contains(HUB_TYPE))
+                .Where(t => t.BaseType != null && t.BaseType.FullName != null && t.BaseType.FullName.Contains(HUB_TYPE))
                 .OrderBy(t => t.FullName)
                 .ToList();
 

@@ -7,7 +7,7 @@ This is a solution enabling TypeScript definitions of your server-side code to b
 Supports WebAPI and SignalR method return/parameter types automatically, or tell it where the classes you want to convert are and it'll do them.
 
 ### Features
-* Generates .d.ts files for all c# classes used by your WebAPI action methods or SignalR hubs (and any other classes in specified namespaces).
+ * Generates .d.ts files for all c# classes used by your WebAPI action methods or SignalR hubs (and any other classes in specified namespaces).
  * Generates interface definitions for SignalR hubs to ensure your client matches the server.
  * Creates a TypeScript class for each WebAPI controller and methods to call the server in a type-safe manner.  Calls to your server can then be made like this:
 ```
@@ -31,7 +31,12 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
 
 5 - The default generation of WebAPI methods requires JQuery to be present, as it using `$.ajax` for calling the server.
 
-[![](
+6 - You must define a variable in your javascript called 'rootPath' that points to the website route, something like this:
+```
+        <script type="text/javascript">
+            var rootPath = '@Url.Content("~/")';
+        </script>
+```
 
 ##### TsGenerator.props Options
  - TsGenInputAssembly [Required] - enter the assembly containing your webapi controllers/signalr hubs/other models here.  The Path is relative to the WebSite Project Directory.
@@ -45,3 +50,6 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
 ### Thanks
 Massive thanks go to [Lukas Kabrt](https://bitbucket.org/LukasKabrt/) for his wonderful [TypeLite](https://bitbucket.org/LukasKabrt/typelite/) library which does the bulk of the 
 TypeScript generation.  I am pleased that I was able to contribute the first version of generics support to his project while making this project.
+
+Also thanks to [Murat Girgin](https://github.com/muratg) whose work on SRTS provided inspiration for the SignalR hub generation (indeed an earlier version used a hacked version
+of this library).
