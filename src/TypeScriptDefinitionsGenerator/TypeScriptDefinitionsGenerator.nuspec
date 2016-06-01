@@ -15,17 +15,18 @@
         <tags>TypeScript Generation TypeLite</tags>
     </metadata>
     <files>
-        <file src="bin\Debug\CommandLine.dll" target="build\net45\CommandLine.dll" />
-        <file src="bin\Debug\Microsoft.AspNet.SignalR.Core.dll" target="build\net45\Microsoft.AspNet.SignalR.Core.dll" />
-        <file src="bin\Debug\Microsoft.Owin.dll" target="build\net45\Microsoft.Owin.dll" />
-        <file src="bin\Debug\Microsoft.Owin.Security.dll" target="build\net45\Microsoft.Owin.Security.dll" />
-        <file src="bin\Debug\Newtonsoft.Json.dll" target="build\net45\Newtonsoft.Json.dll" />
-        <file src="bin\Debug\Owin.dll" target="build\net45\Owin.dll" />
-        <file src="bin\Debug\System.Net.Http.Formatting.dll" target="build\net45\System.Net.Http.Formatting.dll" />
-        <file src="bin\Debug\System.Web.Http.dll" target="build\net45\System.Web.Http.dll" />
-        <file src="bin\Debug\TypeLite.dll" target="build\net45\TypeLite.dll" />
-        <file src="bin\Debug\TypeLite.Net4.dll" target="build\net45\TypeLite.Net4.dll" />
-        <file src="bin\Debug\TypeScriptDefinitionsGenerator.exe" target="build\net45\TypeScriptDefinitionsGenerator.exe" />
+        <file src="bin\Release\CommandLine.dll" target="build\net45\CommandLine.dll" />
+        <file src="bin\Release\Microsoft.AspNet.SignalR.Core.dll" target="build\net45\Microsoft.AspNet.SignalR.Core.dll" />
+        <file src="bin\Release\Microsoft.Owin.dll" target="build\net45\Microsoft.Owin.dll" />
+        <file src="bin\Release\Microsoft.Owin.Security.dll" target="build\net45\Microsoft.Owin.Security.dll" />
+        <file src="bin\Release\Newtonsoft.Json.dll" target="build\net45\Newtonsoft.Json.dll" />
+        <file src="bin\Release\Owin.dll" target="build\net45\Owin.dll" />
+        <file src="bin\Release\System.Net.Http.Formatting.dll" target="build\net45\System.Net.Http.Formatting.dll" />
+        <file src="bin\Release\System.Web.Http.dll" target="build\net45\System.Web.Http.dll" />
+        <file src="bin\Release\TypeLite.dll" target="build\net45\TypeLite.dll" />
+        <file src="bin\Release\TypeLite.Net4.dll" target="build\net45\TypeLite.Net4.dll" />
+        <file src="bin\Release\TypeScriptDefinitionsGenerator.exe" target="build\net45\TypeScriptDefinitionsGenerator.exe" />
+        <file src="bin\Release\TypeScriptDefinitionsGenerator.pdb" target="build\net45\TypeScriptDefinitionsGenerator.pdb" />
         <file src="build\TypeScriptDefinitionsGenerator.targets" target="build\net45\TypeScriptDefinitionsGenerator.targets" />
         <file src="build\TsGenerator.props" target="content\TsGenerator.props" />
     </files>
