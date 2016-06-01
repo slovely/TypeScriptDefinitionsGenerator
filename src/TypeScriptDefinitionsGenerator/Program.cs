@@ -123,7 +123,7 @@ namespace TypeScriptDefinitionsGenerator
 
         private static string WildcardToRegex(string pattern)
         {
-            return "^" + Regex.Escape(pattern).Replace(@"\*", ".*") + "$";
+            return "^" + Regex.Escape(pattern).Replace(@"\%", ".*") + "$";
         }
 
         private static void ProcessMethods(IEnumerable<MethodInfo> methods, TypeScriptFluent generator)

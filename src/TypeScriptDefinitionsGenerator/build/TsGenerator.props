@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <!-- Add namespaces here to also include them in the generation - useful if they are used from MVC or (shudder) WebForms requests which the generator can't determine itself. -->
-    <!-- Use '*' to match recursively  (e.g. Include="MyNamespace.Models*") -->
+    <!-- Use '%%' to match recursively  (e.g. Include="MyNamespace.Models%%" ... wanted it to be '*' but thanks to MSBuild that was scuppered) -->
     <!--<TsNamespaces Include=""></TsNamespaces>-->
   </ItemGroup>
 
