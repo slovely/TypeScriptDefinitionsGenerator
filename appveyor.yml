@@ -1,11 +1,29 @@
 version: 1.0.{build}
+configuration: Release
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
+install:
+- cmd: choco install gitlink
+cache: src\packages -> **\packages.config
+before_build:
+- cmd: nuget restore src\TypeScriptDefinitionsGenerator.sln
 build:
   verbosity: minimal
 after_build:
-- cmd: nuget pack .\src\TypeScriptGenerator\TypeScriptDefinitionsGenerator.nuspec
+- cmd: >-
+    gitlink . -u https://github.com/gittools/gittools.core -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f src\TypeScriptDefinitionsGenerator.sln -ignore SampleWebsite,SampleWebsite.Models
+
+    nuget pack .\src\TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.nuspec -Version %APPVEYOR_BUILD_VERSION%
+artifacts:
+- path: TypeScriptDefinitionsGenerator.*.nupkg
+  name: nuget-package
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/slovely/api/v2/package
+  api_key:
+    secure: XuYyyaeFcL6jP01TpP/tsclgHxby0pk2Gm0VBglwzikpjqbzstw7G+EpD8gRMO7f
+  artifact: nuget-package
