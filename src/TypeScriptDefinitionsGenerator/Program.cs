@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using CommandLine;
@@ -102,7 +103,7 @@ namespace TypeScriptDefinitionsGenerator
             if (options.Namespaces != null && options.Namespaces.Any())
             {
                 var types = assembly.GetTypes()
-                    .Where(t => options.Namespaces.Any(n => (t.Namespace ?? "").StartsWith(n)));
+                    .Where(t => IncludedNamespace(options, t));
                 ProcessTypes(types, generator);
             }
             
@@ -113,6 +114,16 @@ namespace TypeScriptDefinitionsGenerator
             //Generate interface definitions for all classes
             var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
             File.WriteAllText(Path.Combine(options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
+        }
+
+        private static bool IncludedNamespace(Options options, Type t)
+        {
+            return options.Namespaces.Any(n => Regex.IsMatch((t.Namespace ?? ""), WildcardToRegex(n)));
+        }
+
+        private static string WildcardToRegex(string pattern)
+        {
+            return "^" + Regex.Escape(pattern).Replace(@"\*", ".*") + "$";
         }
 
         private static void ProcessMethods(IEnumerable<MethodInfo> methods, TypeScriptFluent generator)
