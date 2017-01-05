@@ -220,6 +220,10 @@
       <Project>{9f338fe9-45c5-432a-93ab-8827402747ba}</Project>
       <Name>SampleWebsite.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SampleWebsite.MoreModels\SampleWebsite.MoreModels.csproj">
+      <Project>{7d064dc2-08fd-418a-add5-16f2d7fe19c2}</Project>
+      <Name>SampleWebsite.MoreModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

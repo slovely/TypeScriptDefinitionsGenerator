@@ -10,12 +10,13 @@
 
   <!--Simple inline task to create -n [ns1] [ns2]...[nsN] namespaces parameter-->
   <UsingTask
-    TaskName="CreateNamespacesParameter"
+    TaskName="CreateMulitpleParameterString"
     TaskFactory="CodeTaskFactory"
     AssemblyFile="$(InlineTasksAssemblyFile)"
     >
     <ParameterGroup>
-      <Namespaces Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <Values Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <ArgumentName Required="true" ParameterType="System.String" />
       <Parameter Output="true" ParameterType="System.String" />
     </ParameterGroup>
     <Task>
@@ -26,9 +27,11 @@
             using Microsoft.Build.Framework;
             using Microsoft.Build.Utilities;
 
-            public class CreateNamespacesParameter : Task
+            public class CreateMulitpleParameterString : Task
             {  
-                public ITaskItem[] Namespaces { get; set; }
+                public string ArgumentName { get; set; }
+            
+                public ITaskItem[] Values { get; set; }
                 
                 [Output]
                 public string Parameter { get; set; }
@@ -37,10 +40,10 @@
                 {
                     Parameter = "";
                     
-                    if (Namespaces == null || !Namespaces.Any()) return true;
+                    if (Values == null || !Values.Any()) return true;
                 
-                    Parameter = "-n ";
-                    Parameter += string.Join(",", Namespaces.Where(n => !string.IsNullOrWhiteSpace(n.ItemSpec)).Select(n => n.ItemSpec));
+                    Parameter = ArgumentName + " ";
+                    Parameter += string.Join(",", Values.Where(n => !string.IsNullOrWhiteSpace(n.ItemSpec)).Select(n => n.ItemSpec));
                     return true;
                 }
             }
@@ -52,15 +55,19 @@
   
   <Target Name="AfterResolveReferences">
 
-    <CreateNamespacesParameter Namespaces="@(TsNamespaces)">
+    <CreateMulitpleParameterString Values="@(TsNamespaces)" ArgumentName="-n">
       <Output TaskParameter="Parameter" PropertyName="NamespacesParam"></Output>
-    </CreateNamespacesParameter>
+    </CreateMulitpleParameterString>
+
+    <CreateMulitpleParameterString Values="@(TsGenInputAssembly)" ArgumentName="-a">
+      <Output TaskParameter="Parameter" PropertyName="InputAssembliesParam"></Output>
+    </CreateMulitpleParameterString>
     
     <PropertyGroup>
       <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; -a $(TsGenInputAssembly) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>

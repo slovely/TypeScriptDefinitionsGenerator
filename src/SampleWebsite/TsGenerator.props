@@ -1,8 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <!-- Specify a path to the DLL containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
-    <TsGenInputAssembly>..\SampleWebsite.Models\bin\$(Configuration)\SampleWebsite.Models.dll</TsGenInputAssembly>
     <!-- Specify the path to output the generated TypeScript (relative to the current project directory) -->
     <TsGenOutputFolder>scripts\app\server</TsGenOutputFolder>
     <!-- true/false - indicates whether WebApi action methods should be generated -->
@@ -13,9 +11,16 @@
     <TsGenUseDefaultServiceCaller>true</TsGenUseDefaultServiceCaller>
   </PropertyGroup>
 
+  <!-- Specify paths to the DLL(s) containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
+  <ItemGroup>
+    <TsGenInputAssembly Include="..\SampleWebsite.Models\bin\$(Configuration)\SampleWebsite.Models.dll" />
+    <TsGenInputAssembly Include="..\SampleWebsite.MoreModels\bin\$(Configuration)\SampleWebsite.MoreModels.dll" />
+  </ItemGroup>
+  
   <ItemGroup>
     <!-- Add namespaces here to also include them in the generation - useful if they are used from MVC or (shudder) WebForms requests which the generator can't determine itself -->
     <TsNamespaces Include="SampleWebsite.Models.OtherModelsWeWantToConvert"></TsNamespaces>
+    <TsNamespaces Include="SampleWebsite.MoreModels%%"></TsNamespaces>
   </ItemGroup>
   
 </Project>

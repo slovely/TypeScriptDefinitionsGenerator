@@ -10,8 +10,8 @@ namespace TypeScriptDefinitionsGenerator
             UseDefaultServiceCaller = true;
         }
 
-        [Option('a', "assembly", Required = true, HelpText = "The DLL containing the items to generate.")]
-        public string Assembly { get; set; }
+        [OptionList('a', "assemblies", Required = true, HelpText = "The DLL(s) containing the items to generate.", Separator = ',')]
+        public List<string> Assemblies { get; set; }
         [Option('o', "output", Required = true, HelpText = "The folder to which the output will be written.")]
         public string OutputFilePath { get; set; }
         [OptionList('n', "namespaces", HelpText = "All classes in this namespace will be converted.", Required = false, Separator = ',')]

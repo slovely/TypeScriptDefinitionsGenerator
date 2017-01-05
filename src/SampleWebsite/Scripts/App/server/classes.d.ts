@@ -13,10 +13,17 @@ declare module SampleWebsite.Models.OtherModelsWeWantToConvert {
 	}
 }
 declare module SampleWebsite.Models.OtherModelsWeWantToConvert.SubFolder {
-	interface AnotherType {
-		SubFoldersAreIncludedToo: string;
-	}
 	interface GenericType<T> {
 		Property: T;
+	}
+}
+declare module SampleWebsite.MoreModels {
+	interface SecondaryModelLibraray {
+		StringProperty: string;
+	}
+}
+declare module SampleWebsite.MoreModels.Nested {
+	interface NestedModel {
+		Id: string;
 	}
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite", "SampleWebsite\SampleWebsite.csproj", "{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.Models", "SampleWebsite.Models\SampleWebsite.Models.csproj", "{9F338FE9-45C5-432A-93AB-8827402747BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.MoreModels", "SampleWebsite.MoreModels\SampleWebsite.MoreModels.csproj", "{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

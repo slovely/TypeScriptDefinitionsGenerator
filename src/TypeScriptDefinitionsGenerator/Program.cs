@@ -35,7 +35,10 @@ namespace TypeScriptDefinitionsGenerator
                     Debugger.Break();
                 }
                 Directory.CreateDirectory(options.OutputFilePath);
-                LoadReferencedAssemblies(options.Assembly);
+                foreach (var assembly in options.Assemblies)
+                {
+                    LoadReferencedAssemblies(assembly);
+                }
                 GenerateTypeScriptContracts(options);
                 GenerateSignalrHubs(options);
                 if (options.GenerateWebApiActions)
@@ -65,49 +68,49 @@ namespace TypeScriptDefinitionsGenerator
 
         private static void GenerateTypeScriptContracts(Options options)
         {
-            var assembly = Assembly.LoadFrom(options.Assembly);
-            Console.WriteLine("Loaded assembly");
-
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
-            //var types = assembly.GetTypes();
-            //ProcessTypes(types, generator);
-
-            // Get the WebAPI controllers...
-            var controllers = assembly.GetTypes().Where(t => typeof(ApiController).IsAssignableFrom(t));
-
-            // Get the return types...
-            var actions = controllers
-                .SelectMany(c => c.GetMethods()
-                    .Where(m => m.IsPublic)
-                    .Where(m => m.DeclaringType == c));
-            ProcessMethods(actions, generator);
-
-            var signalrHubs = assembly.GetTypes().Where(t => typeof (IHub).IsAssignableFrom(t));
-            var methods = signalrHubs
-                .SelectMany(h => h.GetMethods()
-                    .Where(m => m.IsPublic)
-                    .Where(m => m.GetBaseDefinition().DeclaringType == h));
-            ProcessMethods(methods, generator);
-
-            var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
-                .Select(t => t.BaseType.GetGenericArguments()[0]);
-            var clientMethods = clientInterfaceTypes
-                .SelectMany(h => h.GetMethods()
-                    .Where(m => m.IsPublic)
-                    .Where(m => m.DeclaringType == h));
-            ProcessMethods(clientMethods, generator);
-
-            // Add all classes that are declared inside the specified namespace
-            if (options.Namespaces != null && options.Namespaces.Any())
+            foreach (var assemblyName in options.Assemblies)
             {
-                var types = assembly.GetTypes()
-                    .Where(t => IncludedNamespace(options, t));
-                ProcessTypes(types, generator);
+                var assembly = Assembly.LoadFrom(assemblyName);
+                Console.WriteLine("Loaded assembly: " + assemblyName);
+
+                // Get the WebAPI controllers...
+                var controllers = assembly.GetTypes().Where(t => typeof(ApiController).IsAssignableFrom(t));
+
+                // Get the return types...
+                var actions = controllers
+                    .SelectMany(c => c.GetMethods()
+                        .Where(m => m.IsPublic)
+                        .Where(m => m.DeclaringType == c));
+                ProcessMethods(actions, generator);
+
+                var signalrHubs = assembly.GetTypes().Where(t => typeof(IHub).IsAssignableFrom(t));
+                var methods = signalrHubs
+                    .SelectMany(h => h.GetMethods()
+                        .Where(m => m.IsPublic)
+                        .Where(m => m.GetBaseDefinition().DeclaringType == h));
+                ProcessMethods(methods, generator);
+
+                var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
+                    .Select(t => t.BaseType.GetGenericArguments()[0]);
+                var clientMethods = clientInterfaceTypes
+                    .SelectMany(h => h.GetMethods()
+                        .Where(m => m.IsPublic)
+                        .Where(m => m.DeclaringType == h));
+                ProcessMethods(clientMethods, generator);
+
+                // Add all classes that are declared inside the specified namespace
+                if (options.Namespaces != null && options.Namespaces.Any())
+                {
+                    var types = assembly.GetTypes()
+                        .Where(t => IncludedNamespace(options, t));
+                    ProcessTypes(types, generator);
+                }
+
+                generator.AsConstEnums(false);
             }
-            
-            generator.AsConstEnums(false);
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
             File.WriteAllText(Path.Combine(options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
@@ -136,58 +139,64 @@ namespace TypeScriptDefinitionsGenerator
 
         private static void GenerateSignalrHubs(Options options)
         {
-            var assembly = Assembly.LoadFrom(options.Assembly);
-
-            var output = new SignalRGenerator().GenerateHubs(assembly);
-
+            var allOutput = new StringBuilder();
+            foreach (var assemblyName in options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                allOutput.Append(new SignalRGenerator().GenerateHubs(assembly));
+            }
             // Don't create the output if we don't have any hubs!
-            if (string.IsNullOrEmpty(output)) return;
+            if (allOutput.Length == 0) return;
 
-            File.WriteAllText(Path.Combine(options.OutputFilePath, "hubs.d.ts"), output);
+            File.WriteAllText(Path.Combine(options.OutputFilePath, "hubs.d.ts"), allOutput.ToString());
         }
 
         private static void GenerateWebApiActions(Options options)
         {
-            var assembly = Assembly.LoadFrom(options.Assembly);
             var output = new StringBuilder("module Api {");
             //TODO: allow this is be configured
             output.Append(_interfaces);
-            var controllers = assembly.GetTypes().Where(t => typeof(ApiController).IsAssignableFrom(t)).OrderBy(t => t.Name);
 
-            foreach (var controller in controllers)
+            foreach (var assemblyName in options.Assemblies)
             {
-                var controllerName = controller.Name.Replace("Controller", "");
-                output.AppendFormat("\r\n  export class {0} {{\r\n", controllerName);
-                var actions = controller.GetMethods()
-                    .Where(m => m.IsPublic)
-                    .Where(m => m.DeclaringType == controller)
-                    .OrderBy(m => m.Name);
+                var assembly = Assembly.LoadFrom(assemblyName);
+                var controllers = assembly.GetTypes().Where(t => typeof(ApiController).IsAssignableFrom(t)).OrderBy(t => t.Name);
 
-                // TODO: WebAPI supports multiple actions with the same name but different parameters - this doesn't!
-                foreach (var action in actions)
+                foreach (var controller in controllers)
                 {
-                    if (NotAnAction(action)) continue;
+                    var controllerName = controller.Name.Replace("Controller", "");
+                    output.AppendFormat("\r\n  export class {0} {{\r\n", controllerName);
+                    var actions = controller.GetMethods()
+                        .Where(m => m.IsPublic)
+                        .Where(m => m.DeclaringType == controller)
+                        .OrderBy(m => m.Name);
 
-                    var httpMethod = GetHttpMethod(action);
-                    var actionName = GetActionName(action);
-                    var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
+                    // TODO: WebAPI supports multiple actions with the same name but different parameters - this doesn't!
+                    foreach (var action in actions)
+                    {
+                        if (NotAnAction(action)) continue;
 
-                    var actionParameters = GetActionParameters(action);
-                    var routeParameters = GetRouteParameters(actionParameters);
-                    var queryStringParameters = GetQueryStringParameters(actionParameters);
-                    var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
-                    var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
+                        var httpMethod = GetHttpMethod(action);
+                        var actionName = GetActionName(action);
+                        var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
 
-                    // allow ajax options to be passed in to override defaults
-                    output.AppendFormat("    public static {0}({1}): JQueryPromise<{2}> {{\r\n", 
-                        actionName, GetMethodParameters(actionParameters), returnType);
-                    output.AppendFormat("      return ServiceCaller.{0}(\"api/{1}/{2}{3}{4}\", {5}, ajaxOptions);\r\n",
-                        httpMethod, controllerName, actionName, routeParameters, queryStringParameters, dataParameterName);
-                    output.AppendLine("    }");
-                    output.AppendLine();
+                        var actionParameters = GetActionParameters(action);
+                        var routeParameters = GetRouteParameters(actionParameters);
+                        var queryStringParameters = GetQueryStringParameters(actionParameters);
+                        var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
+                        var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
+
+                        // allow ajax options to be passed in to override defaults
+                        output.AppendFormat("    public static {0}({1}): JQueryPromise<{2}> {{\r\n",
+                            actionName, GetMethodParameters(actionParameters), returnType);
+                        output.AppendFormat("      return ServiceCaller.{0}(\"api/{1}/{2}{3}{4}\", {5}, ajaxOptions);\r\n",
+                            httpMethod, controllerName, actionName, routeParameters, queryStringParameters, dataParameterName);
+                        output.AppendLine("    }");
+                        output.AppendLine();
+                    }
+
+                    output.AppendLine("  }");
                 }
-
-                output.AppendLine("  }");
             }
 
             output.Append("}");

@@ -39,7 +39,7 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
 ```
 
 ##### TsGenerator.props Options
- - TsGenInputAssembly [Required] - enter the assembly containing your webapi controllers/signalr hubs/other models here.  The Path is relative to the WebSite Project Directory.
+ - TsGenInputAssembly [Required] - enter the assemblies containing your webapi controllers/signalr hubs/other models here.  The Path is relative to the WebSite Project Directory.  You must add at least one assembly.
  - TsGenOutputFolder [Required] - enter the path where the generated typescript files should go.  The path is relative to the WebSite Project Directory.
  - TsGenWebApiMethods [Optional, default true] - Enter false to switch off generation of WebAPI methods (no `actions.ts` will be created).
  - TsGenUseDefaultServiceCaller [Optional, default true] - Enter false to prevent 'servicecaller'ts' being generated.
