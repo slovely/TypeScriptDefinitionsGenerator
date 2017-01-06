@@ -21,6 +21,8 @@ namespace TypeScriptDefinitionsGenerator
 {
     internal class Program
     {
+        private const string workingPath = "working";
+
         private static void Main(string[] args)
         {
             Console.WriteLine("==============" + AppDomain.CurrentDomain.BaseDirectory);
@@ -34,6 +36,10 @@ namespace TypeScriptDefinitionsGenerator
                     Debugger.Launch();
                     Debugger.Break();
                 }
+                // Create and empty working folder
+                var workingDir = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath));
+                workingDir.EnumerateFiles().ToList().ForEach(f => f.Delete());
+
                 Directory.CreateDirectory(options.OutputFilePath);
                 foreach (var assembly in options.Assemblies)
                 {
@@ -57,7 +63,7 @@ namespace TypeScriptDefinitionsGenerator
             {
                 try
                 {
-                    File.Copy(file, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, new FileInfo(file).Name), true);
+                    File.Copy(file, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, new FileInfo(file).Name), true);
                 }
                 catch (IOException ex)
                 {
@@ -73,10 +79,10 @@ namespace TypeScriptDefinitionsGenerator
 
             foreach (var assemblyName in options.Assemblies)
             {
+                var fi = new FileInfo(assemblyName);
                 // Load all input assemblies from the same location to ensure duplicates aren't generated (as the same type loaded from 
-                // two different places will appear to be diffent, so both will be generated).
-                var assembly = Assembly.LoadFrom(assemblyName);
-
+                // two different places will appear to be diffent, so both would otherwise be generated).
+                var assembly = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, fi.Name));
                 Console.WriteLine("Loaded assembly: " + assemblyName);
 
                 // Get the WebAPI controllers...
@@ -114,46 +120,6 @@ namespace TypeScriptDefinitionsGenerator
 
                 generator.AsConstEnums(false);
             }
-
-            // This is a bit of a hack... if we have multiple assemblies, we might get duplicate types (loaded from a 
-            // different location, so appear different), so use reflection to compare the classes/enums and remove
-            // any that match on TypeName.
-            var classesPropInfo = generator.ModelBuilder.GetType().GetProperty("Classes", BindingFlags.NonPublic | BindingFlags.Instance);
-            var classesProp = classesPropInfo.GetValue(generator.ModelBuilder) as Dictionary<Type, TsClass>;
-
-            var enumsPropInfo = generator.ModelBuilder.GetType().GetProperty("Enums", BindingFlags.NonPublic | BindingFlags.Instance);
-            var enumsProp = enumsPropInfo.GetValue(generator.ModelBuilder) as Dictionary<Type, TsEnum>;
-
-            var keysToRemove = new List<Type>();
-            for (var i = 0; i < classesProp.Keys.Count; i++)
-            {
-                var type = classesProp.Keys.ElementAt(i).FullName;
-                for (var j = i + 1; j < classesProp.Keys.Count; j++)
-                {
-                    var otherType = classesProp.Keys.ElementAt(j).FullName;
-                    if (type == otherType)
-                    {
-                        keysToRemove.Add(classesProp.Keys.ElementAt(j));
-                    }
-                }
-            }
-            keysToRemove.ForEach(k => classesProp.Remove(k));
-
-
-            var enumKeysToRemove = new List<Type>();
-            for (var i = 0; i < enumsProp.Keys.Count; i++)
-            {
-                var type = enumsProp.Keys.ElementAt(i).FullName;
-                for (var j = i + 1; j < enumsProp.Keys.Count; j++)
-                {
-                    var otherType = enumsProp.Keys.ElementAt(j).FullName;
-                    if (type == otherType)
-                    {
-                        enumKeysToRemove.Add(enumsProp.Keys.ElementAt(j));
-                    }
-                }
-            }
-            enumKeysToRemove.ForEach(k => enumsProp.Remove(k));
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
             File.WriteAllText(Path.Combine(options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
