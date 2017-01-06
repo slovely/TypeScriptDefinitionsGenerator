@@ -46,7 +46,7 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
  - TsGenDebug [Optional, default false] - This is used to aid debugging the build.  Enter true to be prompted to attach a debugger when building.
  - TsNamespaces [Optional] - Enter a list of namespaces for classes you want to generate even if they aren't references from WebAPI / SignalR hubs.  Use '%%' as a wildcard (sorry, not very friendly - thank MSBuild!).
 
-## Multiple Assemblies
+##### Multiple Assemblies
 When using multiple assemblies, to avoid a whole world of pain, ensure that all any dependencies shared between the assemblies are the same version (e.g. if you reference JSON.NET v9.0.0 in one project, make sure the other project references v9.0.0 as well).
 
 ### Thanks
