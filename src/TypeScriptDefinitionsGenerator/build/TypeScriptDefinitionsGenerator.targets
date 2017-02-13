@@ -66,8 +66,9 @@
     <PropertyGroup>
       <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
+      <GenerateServiceCallerParam Condition="'$(TsGenUseDefaultServiceCaller)' == 'true'">--defaultservicecaller</GenerateServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(GenerateServiceCallerParam)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
