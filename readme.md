@@ -42,7 +42,7 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
  - TsGenInputAssembly [Required] - enter the assemblies containing your webapi controllers/signalr hubs/other models here.  The Path is relative to the WebSite Project Directory.  You must add at least one assembly.
  - TsGenOutputFolder [Required] - enter the path where the generated typescript files should go.  The path is relative to the WebSite Project Directory.
  - TsGenWebApiMethods [Optional, default true] - Enter false to switch off generation of WebAPI methods (no `actions.ts` will be created).
- - TsGenUseDefaultServiceCaller [Optional, default true] - Enter false to prevent 'servicecaller'ts' being generated.
+ - TsGenSuppressDefaultServiceCaller [Optional, default true] - Enter false to prevent `servicecaller.ts` being generated.
  - TsGenDebug [Optional, default false] - This is used to aid debugging the build.  Enter true to be prompted to attach a debugger when building.
  - TsNamespaces [Optional] - Enter a list of namespaces for classes you want to generate even if they aren't references from WebAPI / SignalR hubs.  Use '%%' as a wildcard (sorry, not very friendly - thank MSBuild!).
 

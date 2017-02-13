@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using CommandLine;
+using CommandLine.Text;
 using Microsoft.AspNet.SignalR.Hubs;
 using TypeLite;
 using TypeLite.TsModels;
@@ -213,7 +214,7 @@ namespace TypeScriptDefinitionsGenerator
 
             File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
 
-            if (options.UseDefaultServiceCaller)
+            if (!options.SuppressDefaultServiceCaller)
             {
                 // Write the default service caller
                 using (var stream = typeof(Program).Assembly.GetManifestResourceStream(typeof(Program).Namespace + ".Resources.ServiceCaller.ts"))

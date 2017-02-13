@@ -7,7 +7,6 @@ namespace TypeScriptDefinitionsGenerator
     {
         public Options()
         {
-            UseDefaultServiceCaller = true;
         }
 
         [OptionList('a', "assemblies", Required = true, HelpText = "The DLL(s) containing the items to generate.", Separator = ',')]
@@ -20,7 +19,7 @@ namespace TypeScriptDefinitionsGenerator
         public bool GenerateWebApiActions { get; set; }
         [Option("debugger", HelpText = "Will prompt to attach the debugger")]
         public bool AttachDebugger { get; set; }
-        [Option("defaultservicecaller", HelpText = "Use the default service caller (that uses JQuery ajax methods)", DefaultValue = true)]
-        public bool UseDefaultServiceCaller { get; set; }
+        [Option("suppressdefaultservicecaller", HelpText = "Don't use the default service caller (that uses JQuery ajax methods)", DefaultValue = false)]
+        public bool SuppressDefaultServiceCaller { get; set; }
     }
 }

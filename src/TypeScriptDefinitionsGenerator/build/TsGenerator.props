@@ -5,8 +5,8 @@
     <TsGenOutputFolder>scripts\server</TsGenOutputFolder>
     <!-- true/false - indicates whether WebApi action methods should be generated -->
     <TsGenWebApiMethods>true</TsGenWebApiMethods>
-    <!-- Set to false to use your own service caller -->
-    <TsGenUseDefaultServiceCaller>true</TsGenUseDefaultServiceCaller>
+    <!-- Set to true to use your own service caller -->
+    <TsGenSuppressDefaultServiceCaller>false</TsGenSuppressDefaultServiceCaller>
   </PropertyGroup>
 
   <!-- Specify paths to the DLL(s) containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
