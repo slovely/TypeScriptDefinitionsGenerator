@@ -29,6 +29,12 @@
             if (settings.data instanceof Array) {
                 settings.data = { '': settings.data };
             }
+
+            // If contentType is JSON, then serialize the data if not already.
+            if (typeof settings.data !== "string" && settings.contentType === "application/json") {
+                settings.data = JSON.stringify(settings.data);
+            }
+
             return $.ajax(rootPath + url, settings).fail((jqXhr: JQueryXHR) => {
                 this.defaultErrorHandler(settings, jqXhr);
             });
