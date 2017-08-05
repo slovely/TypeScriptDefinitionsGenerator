@@ -15,7 +15,7 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    gitlink . -u https://github.com/slovely/TypeScriptDefinitionsGenerator -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f src\TypeScriptDefinitionsGenerator.sln -ignore SampleWebsite,SampleWebsite.Models
+    REM gitlink . -u https://github.com/slovely/TypeScriptDefinitionsGenerator -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f src\TypeScriptDefinitionsGenerator.sln -ignore SampleWebsite,SampleWebsite.Models
 
     nuget pack .\src\TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.nuspec -Version %APPVEYOR_BUILD_VERSION%
 artifacts:
