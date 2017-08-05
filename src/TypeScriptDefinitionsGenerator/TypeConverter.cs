@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TypeScriptDefinitionsGenerator.Extensions;
 
 namespace TypeScriptDefinitionsGenerator
@@ -50,7 +51,10 @@ namespace TypeScriptDefinitionsGenerator
             {
                 clrType = clrType.GetUnderlyingTaskType();
             }
-
+            if (clrType.IsTask())
+            {
+                return "void";
+            }
             if (_cache.TryGetValue(clrType, out result))
             {
                 return result;

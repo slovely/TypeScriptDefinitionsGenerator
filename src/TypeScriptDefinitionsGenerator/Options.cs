@@ -17,9 +17,17 @@ namespace TypeScriptDefinitionsGenerator
         public List<string> Namespaces { get; set; }
         [Option("webapiactions", HelpText = "Indicates that methods should be generated for WebAPI actions")]
         public bool GenerateWebApiActions { get; set; }
+        [Option("actionsstyle", HelpText = "Indicates that the style of action methods generated")]
+        public ActionsStyle ActionsStyle { get; set; }
         [Option("debugger", HelpText = "Will prompt to attach the debugger")]
         public bool AttachDebugger { get; set; }
         [Option("suppressdefaultservicecaller", HelpText = "Don't use the default service caller (that uses JQuery ajax methods)", DefaultValue = false)]
         public bool SuppressDefaultServiceCaller { get; set; }
+    }
+
+    public enum ActionsStyle
+    {
+        Default,
+        Aurelia,
     }
 }

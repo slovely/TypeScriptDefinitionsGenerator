@@ -50,8 +50,22 @@ namespace TypeScriptDefinitionsGenerator
                 GenerateSignalrHubs(options);
                 if (options.GenerateWebApiActions)
                 {
-                    GenerateWebApiActions(options);
+                    switch (options.ActionsStyle)
+                    {
+                        case ActionsStyle.Default:
+                            GenerateWebApiActions(options);
+                            break;
+                        case ActionsStyle.Aurelia:
+                            GenerateAureliWebApiActions(options);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("TypeScriptGenerator: Could not parse args: " + string.Join(" ", args));
             }
             Console.WriteLine("TypeScriptGenerator Finished: " + DateTime.Now.ToString("HH:mm:ss"));
         }
@@ -199,7 +213,7 @@ namespace TypeScriptDefinitionsGenerator
 
                         // allow ajax options to be passed in to override defaults
                         output.AppendFormat("    public static {0}({1}): JQueryPromise<{2}> {{\r\n",
-                            actionName, GetMethodParameters(actionParameters), returnType);
+                            actionName, GetMethodParameters(actionParameters, "IExtendedAjaxSettings"), returnType);
                         output.AppendFormat("      return ServiceCaller.{0}(\"api/{1}/{2}{3}{4}\", {5}, ajaxOptions);\r\n",
                             httpMethod, controllerName, actionName, routeParameters, queryStringParameters, dataParameterName);
                         output.AppendLine("    }");
@@ -223,7 +237,64 @@ namespace TypeScriptDefinitionsGenerator
                     File.WriteAllText(Path.Combine(options.OutputFilePath, "servicecaller.ts"), reader.ReadToEnd());
                 }
             }
+        }
 
+        private static void GenerateAureliWebApiActions(Options options)
+        {
+            var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
+            output.AppendLine("import {HttpClient, json} from \"aurelia-fetch-client\";\r\n");
+
+            foreach (var assemblyName in options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                var controllers = assembly.GetTypes().Where(t => typeof(ApiController).IsAssignableFrom(t)).OrderBy(t => t.Name);
+
+                foreach (var controller in controllers)
+                {
+                    var controllerName = controller.Name.Replace("Controller", "");
+                    output.AppendLine("  @autoinject");
+                    output.AppendFormat("  export class {0} {{\r\n", controllerName);
+                    output.AppendLine("    constructor(private http: HttpClient) {");
+                    output.AppendLine("    }");
+                    var actions = controller.GetMethods()
+                        .Where(m => m.IsPublic)
+                        .Where(m => m.DeclaringType == controller)
+                        .OrderBy(m => m.Name);
+
+                    // TODO: WebAPI supports multiple actions with the same name but different parameters - this doesn't!
+                    foreach (var action in actions)
+                    {
+                        if (NotAnAction(action)) continue;
+
+                        var httpMethod = GetHttpMethod(action);
+                        var actionName = GetActionName(action);
+                        var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
+
+                        var actionParameters = GetActionParameters(action);
+                        var routeParameters = GetRouteParameters(actionParameters);
+                        var queryStringParameters = GetQueryStringParameters(actionParameters);
+                        var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
+                        var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
+
+                        // allow ajax options to be passed in to override defaults
+                        output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
+                            actionName, GetMethodParameters(actionParameters, "RequestInit"), returnType);
+                        output.AppendFormat("      const options: RequestInit = {{ \r\n        method: \"{0}\", \r\n", httpMethod);
+                        output.AppendFormat("        body: {0} ? json({0}) : null\r\n", dataParameterName);
+                        output.AppendLine("      };");
+                        output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
+                        output.AppendFormat("      return this.http.fetch(\"api/{0}/{1}{2}{3}\", options)\r\n" +
+                            "        .then(response => response ? response.json() : null);\r\n",
+                            controllerName, actionName, routeParameters, queryStringParameters);
+                        output.AppendLine("    }");
+                        output.AppendLine();
+                    }
+
+                    output.AppendLine("  }");
+                }
+            }
+
+            File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
         }
 
         private static string GetQueryStringParameters(List<ActionParameterInfo> actionParameters)
@@ -240,11 +311,11 @@ namespace TypeScriptDefinitionsGenerator
             return result;
         }
 
-        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters)
+        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType)
         {
             var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + a.Type));
             if (result != "") result += ", ";
-            result += "ajaxOptions: IExtendedAjaxSettings = null";
+            result += "ajaxOptions: " + settingsType + " = null";
             return result;
         }
 

@@ -20,6 +20,10 @@ namespace TypeScriptDefinitionsGenerator.Extensions
                 return type.GetGenericTypeDefinition() == typeof(Task<>);
             return false;
         }
+        public static bool IsTask(this Type type)
+        {
+            return type == typeof(Task);
+        }
 
         public static bool IsIDictionary(this Type type)
         {
