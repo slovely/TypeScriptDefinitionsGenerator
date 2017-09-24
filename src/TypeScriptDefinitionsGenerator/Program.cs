@@ -284,7 +284,7 @@ namespace TypeScriptDefinitionsGenerator
                         output.AppendLine("      };");
                         output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
                         output.AppendFormat("      return this.http.fetch(\"api/{0}/{1}{2}{3}\", options)\r\n" +
-                            "        .then(response => response ? response.json() : null);\r\n",
+                            "        .then(response => (response && response.status!==204) ? response.json() : null);\r\n",
                             controllerName, actionName, routeParameters, queryStringParameters);
                         output.AppendLine("    }");
                         output.AppendLine();
