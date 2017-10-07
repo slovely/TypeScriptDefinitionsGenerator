@@ -45,7 +45,72 @@ Api.myWebApiController.getPerson(3).done(person => alert(person.Name));
  - TsGenSuppressDefaultServiceCaller [Optional, default true] - Enter false to prevent `servicecaller.ts` being generated.
  - TsGenDebug [Optional, default false] - This is used to aid debugging the build.  Enter true to be prompted to attach a debugger when building.
  - TsNamespaces [Optional] - Enter a list of namespaces for classes you want to generate even if they aren't references from WebAPI / SignalR hubs.  Use '%%' as a wildcard (sorry, not very friendly - thank MSBuild!).
+ - TsGenApiMethodStyle [Optional] - if using TsGenWebApiMethods option, this specifies the style of the client-side API calls, can be either 'Default' or 'Aurelia'. 
 
+##### TsGenApiMethodStyle / TsGenWebApiMethods
+
+Setting TsGenWebApiMethods to `true` will search your assemblies for WebAPI actions and generate TypeScript methods so you can call them in a type-safe way.  
+The default format of the call will be like this:
+```
+    // Example c# Web API method
+    [HttpGet]
+    public Person LoadPerson(int id, string type) { .... }
+    
+    // Generated TS (output to actions.ts)
+    //AUTOGEN START
+    module Api {
+        export class Person{
+            public static search(id: number, name: string, ajaxOptions: JQueryAjaxSettings = null): JQueryPromise<Person> {
+                return ServiceCaller.get("api/person/search/" + id + "?name=" + name, null, ajaxOptions);
+        }
+    }
+    //AUTOGEN END
+    
+    // Now you can use this like this:
+    Api.Person.loadPerson(42, "Dave").done(response => alert(response.Name));
+```
+By default, `ServiceCaller.ts` will also be output and will use JQuery AJAX methods to make the calls to the server.  It supports [HttpPost]/[HttpGet] attributes as well as 
+understanding whether parameters are part of the URL (route parameters), request body ([FromBody]) or QueryString (everything else).  If you do not use JQuery
+you can set TsGenSuppressDefaultServiceCaller=true, and provide your own implementation instead - although currently `actions.ts` will still return `JQueryPromise`
+results.  When calling the methods, you can optionally override AJAX settings by supplying a standard JQueryAjaxSettings object.
+
+By setting TsGenWebApiMethods=Aurelia, the generated methods will use the Aurelia `HttpClient` instead of JQuery.  The output will then be something like this:
+```
+    //AUTOGEN START
+    import {autoinject} from "aurelia-dependency-injection";
+    import {HttpClient, json} from "aurelia-fetch-client";
+    
+    @autoinject
+    export class Person {
+        constructor(private http: HttpClient) {
+        }
+            
+        public search(id: number, name: string, ajaxOptions: RequestInit = null): PromiseLike<Person> {
+            const options: RequestInit = { 
+                method: "get", 
+                body: null
+            };
+            if (ajaxOptions) Object.assign(options, ajaxOptions);
+            return this.http.fetch("api/person/search/" + id + "?name=" + name, options)
+              .then(response => (response && response.status!==204) ? response.json() : null);
+        }
+    }
+    //AUTOGEN END
+    
+    // Now in your Aurelia models, you can inject this in like this:
+    import Actions = require("../server/actions");
+    
+    @autoinject
+    export class PersonViewModel {
+        constructor(personCtrl: Actions.Person) {
+            personCtrl.search(1, "Joe").then(result => alert(result.Name));
+        }
+    }
+```
+
+The generation currently only works with actions using the {controller}/{action}/{id} route format, or if the method has a custom `[RouteAttribute]`.  
+ 
+ 
 ##### Multiple Assemblies
 When using multiple assemblies, to avoid a whole world of pain, ensure that all any dependencies shared between the assemblies are the same version (e.g. if you reference JSON.NET v9.0.0 in one project, make sure the other project references v9.0.0 as well).
 

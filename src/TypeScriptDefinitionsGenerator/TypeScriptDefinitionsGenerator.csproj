@@ -109,7 +109,7 @@
     <EmbeddedResource Include="Resources\ServiceCaller.ts" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>cd $(ProjectDir)\bin\$(Configuration)
+    <PostBuildEvent Condition="'$(Configuration)'=='Debug'" >cd $(ProjectDir)\bin\$(Configuration)
       copy TypeScriptDefinitionsGenerator.* ..\..\..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\*.*</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
