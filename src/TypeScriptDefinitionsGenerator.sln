@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.Models", "Sam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.MoreModels", "SampleWebsite.MoreModels\SampleWebsite.MoreModels.csproj", "{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptGenerator.Tests", "TypeScriptGenerator.Tests\TypeScriptGenerator.Tests.csproj", "{E9853A84-18C9-4419-9F70-BD6F54E2563A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

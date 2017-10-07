@@ -23,6 +23,7 @@ namespace TypeScriptDefinitionsGenerator
     internal class Program
     {
         private const string workingPath = "working";
+        private static WebApiUrlGenerator _urlGenerator = new WebApiUrlGenerator();
 
         private static void Main(string[] args)
         {
@@ -202,20 +203,17 @@ namespace TypeScriptDefinitionsGenerator
                         if (NotAnAction(action)) continue;
 
                         var httpMethod = GetHttpMethod(action);
-                        var actionName = GetActionName(action);
                         var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
 
                         var actionParameters = GetActionParameters(action);
-                        var routeParameters = GetRouteParameters(actionParameters);
-                        var queryStringParameters = GetQueryStringParameters(actionParameters);
                         var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
                         var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
-
+                        var url = _urlGenerator.GetUrl(action);
                         // allow ajax options to be passed in to override defaults
                         output.AppendFormat("    public static {0}({1}): JQueryPromise<{2}> {{\r\n",
-                            actionName, GetMethodParameters(actionParameters, "IExtendedAjaxSettings"), returnType);
-                        output.AppendFormat("      return ServiceCaller.{0}(\"api/{1}/{2}{3}{4}\", {5}, ajaxOptions);\r\n",
-                            httpMethod, controllerName, actionName, routeParameters, queryStringParameters, dataParameterName);
+                            action.Name.ToCamelCase(), GetMethodParameters(actionParameters, "IExtendedAjaxSettings"), returnType);
+                        output.AppendFormat("      return ServiceCaller.{0}({1}, {2}, ajaxOptions);\r\n",
+                            httpMethod, url, dataParameterName);
                         output.AppendLine("    }");
                         output.AppendLine();
                     }
@@ -271,11 +269,9 @@ namespace TypeScriptDefinitionsGenerator
                         var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
 
                         var actionParameters = GetActionParameters(action);
-                        var routeParameters = GetRouteParameters(actionParameters);
-                        var queryStringParameters = GetQueryStringParameters(actionParameters);
                         var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
                         var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
-
+                        var url = _urlGenerator.GetUrl(action);
                         // allow ajax options to be passed in to override defaults
                         output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
                             actionName, GetMethodParameters(actionParameters, "RequestInit"), returnType);
@@ -283,9 +279,9 @@ namespace TypeScriptDefinitionsGenerator
                         output.AppendFormat("        body: {0} ? json({0}) : null\r\n", dataParameterName);
                         output.AppendLine("      };");
                         output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
-                        output.AppendFormat("      return this.http.fetch(\"api/{0}/{1}{2}{3}\", options)\r\n" +
+                        output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
                             "        .then(response => (response && response.status!==204) ? response.json() : null);\r\n",
-                            controllerName, actionName, routeParameters, queryStringParameters);
+                            url);
                         output.AppendLine("    }");
                         output.AppendLine();
                     }
@@ -295,20 +291,6 @@ namespace TypeScriptDefinitionsGenerator
             }
 
             File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
-        }
-
-        private static string GetQueryStringParameters(List<ActionParameterInfo> actionParameters)
-        {
-            var result = string.Join("&", actionParameters.Where(a => a.FromUri && !a.RouteProperty).Select(a => a.Name + "=\" + " + a.Name + " + \""));
-            if (result != "") result = "?" + result;
-            return result;
-        }
-
-        private static string GetRouteParameters(List<ActionParameterInfo> actionParameters)
-        {
-            var result = string.Join("/", actionParameters.Where(a => a.RouteProperty).Select(a => "\" + " + a.Name + " + \""));
-            if (result != "") result = "/" + result;
-            return result;
         }
 
         private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType)
@@ -355,7 +337,7 @@ namespace TypeScriptDefinitionsGenerator
             // TODO: Support ActionNameAttribute
             return action.Name.ToCamelCase();
         }
-
+        
         private static string GetHttpMethod(MethodInfo action)
         {
             // TODO: Support other http methods
@@ -421,12 +403,5 @@ namespace TypeScriptDefinitionsGenerator
 
 ";
 
-        private class ActionParameterInfo
-        {
-            public string Name { get; set; }
-            public bool FromUri { get; set; }
-            public bool RouteProperty { get; set; }
-            public string Type { get; set; }
-        }
     }
 }

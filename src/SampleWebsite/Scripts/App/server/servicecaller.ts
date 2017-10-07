@@ -25,6 +25,11 @@ module Api {
             // Allow data to be overridden by passing it in via ajaxOptions parameter.
             if (!settings.data) settings.data = data;
 
+            // If contentType is JSON, then serialize the data if not already.
+            if (typeof settings.data !== "string" && settings.contentType === "application/json") {
+                settings.data = JSON.stringify(settings.data);
+            }
+
             // Workaround for arrays: http://aspnetwebstack.codeplex.com/workitem/177
             if (settings.data instanceof Array) {
                 settings.data = { '': settings.data };
