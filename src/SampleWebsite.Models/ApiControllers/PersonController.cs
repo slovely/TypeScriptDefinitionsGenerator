@@ -12,7 +12,6 @@ namespace SampleWebsite.Models.ApiControllers
         
         [HttpGet]
         [Route("api/custom/{personid}/load")]
-        [Route("api/controller/{personid1}/load2")]
         public Person GetPersonCustom(int personid)
         {
             return new Person { Name = "Joe Bloggs:" + personid, Gender = Gender.Male };

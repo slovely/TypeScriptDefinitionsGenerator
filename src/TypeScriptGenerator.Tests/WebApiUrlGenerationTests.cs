@@ -50,7 +50,7 @@ namespace TypeScriptGenerator.Tests
         {
             var method = GetMethodInfo<FakeController>(c => c.CustomRouteWithParameters(null, null));
             var url = _generator.GetUrl(method);
-            Assert.Equal("\"api/custom/\" + customerId + \"/orders/\" + orderId + \"\" + \"?customerId=\" + customerId + \"&orderId=\" + orderId + \"\"", url);
+            Assert.Equal("\"api/custom/\" + customerId + \"/orders/\" + orderId + \"\"", url);
         }
 
         [Fact]
@@ -67,6 +67,14 @@ namespace TypeScriptGenerator.Tests
             var method = GetMethodInfo<FakeController>(c => c.OverrideParamName(123));
             var url = _generator.GetUrl(method);
             Assert.Equal("\"api/Fake/overrideParamName\" + \"?x=\" + x + \"\"", url);
+        }
+
+        [Fact]
+        public void Issue9RegressionTest()
+        {
+            var method = GetMethodInfo<FakeController>(c => c.GetFlightDetails("ABC"));
+            var url = _generator.GetUrl(method);
+            Assert.Equal("\"api/v1/flights/\" + flightIdentifier + \"/flightdetails\"", url);
         }
         
         private MethodInfo GetMethodInfo<TCtrl>(Expression<Action<TCtrl>> expression)

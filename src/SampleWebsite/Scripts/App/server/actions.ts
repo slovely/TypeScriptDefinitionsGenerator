@@ -18,7 +18,7 @@ module Api {
     }
 
     public static getPersonCustom(personid: number, ajaxOptions: IExtendedAjaxSettings = null): JQueryPromise<SampleWebsite.Models.Person> {
-      return ServiceCaller.get("api/custom/" + personid + "/load" + "?personid=" + personid + "", null, ajaxOptions);
+      return ServiceCaller.get("api/custom/" + personid + "/load", null, ajaxOptions);
     }
 
   }

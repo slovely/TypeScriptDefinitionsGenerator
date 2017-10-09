@@ -29,6 +29,12 @@ namespace TypeScriptGenerator.Tests
         public void CustomRouteWithParameters(string customerId, string orderId)
         {
         }
+
+        [HttpGet]
+        [Route("api/v1/flights/{flightIdentifier}/flightdetails")]
+        public void GetFlightDetails(string flightIdentifier)
+        {
+        }
         
         public int ActionMethodWithBodyAndQueryString([FromBody] string body, int queryId)
         {

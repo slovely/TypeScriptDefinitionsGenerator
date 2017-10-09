@@ -60,7 +60,7 @@ namespace TypeScriptDefinitionsGenerator
                     var value = m.Groups[2].Value;
                     routeParametersList.Add(value);
                     var actionParam = actionParameters.FirstOrDefault(a => a.OriginalName == value);
-                    if (actionParam != null) actionParam.FromUri = true;
+                    if (actionParam != null) actionParam.RouteProperty = true;
                     return m.Groups[1].Value + "\" + " + value + " + \"" + m.Groups[3].Value;
                 });
             }
