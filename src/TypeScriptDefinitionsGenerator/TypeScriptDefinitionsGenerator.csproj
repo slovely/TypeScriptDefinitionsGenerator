@@ -38,10 +38,6 @@
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
@@ -109,7 +105,7 @@
     <EmbeddedResource Include="Resources\ServiceCaller.ts" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent Condition="'$(Configuration)'=='Debug'" >cd $(ProjectDir)\bin\$(Configuration)
+    <PostBuildEvent Condition="'$(Configuration)'=='Debug'">cd $(ProjectDir)\bin\$(Configuration)
       copy TypeScriptDefinitionsGenerator.* ..\..\..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\*.*</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

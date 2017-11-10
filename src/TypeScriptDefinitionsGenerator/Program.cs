@@ -11,10 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using CommandLine;
-using CommandLine.Text;
-using Microsoft.AspNet.SignalR.Hubs;
 using TypeLite;
-using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Extensions;
 using TypeScriptDefinitionsGenerator.SignalR;
 
