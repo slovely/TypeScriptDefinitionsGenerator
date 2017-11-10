@@ -8,7 +8,8 @@ namespace TypeScriptDefinitionsGenerator.SignalR
 {
     public class SignalRGenerator
     {
-        private const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
+        public const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
+        public const string IHUB_TYPE = "Microsoft.AspNet.SignalR.Hubs.IHub";
 
         public string GenerateHubs(Assembly assembly)
         {
