@@ -47,7 +47,22 @@ namespace TypeScriptDefinitionsGenerator.Core
                 {
                     LoadReferencedAssemblies(assembly);
                 }
-                GenerateTypeScriptContracts(options);
+                try
+                {
+                    // TODO: Inspect the <assembly>.runtimeconfig.dev.json file to find places where packages can be loaded
+                    GenerateTypeScriptContracts(options);
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    Console.WriteLine("Reflection errors:");
+                    foreach (var x in ex.LoaderExceptions)
+                    {
+                        Console.WriteLine(x.Message);
+                    }
+                    Console.WriteLine("***You might be able to fix this by adding: <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> to your csproj file, until I figure out how to " +
+                                      "use the deps.json / runtimeconfig.json files to load referenced assemblies automatically.");
+                    throw;
+                }
                 /*
                 GenerateSignalrHubs(options);
                 */

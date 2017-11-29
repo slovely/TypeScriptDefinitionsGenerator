@@ -25,11 +25,15 @@ namespace TypeScriptDefinitionsGenerator
         private static void Main(string[] args)
         {
             Console.WriteLine("==============" + AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine("TypeScriptGenerator Stated: " + DateTime.Now.ToString("HH:mm:ss"));
+            Console.WriteLine("TypeScriptGenerator CORE Stated: " + DateTime.Now.ToString("HH:mm:ss"));
 
             var options = new Options();
             if (Parser.Default.ParseArguments(args, options))
             {
+                Console.WriteLine("Assemblies: ");
+                foreach (var a in options.Assemblies) Console.WriteLine(" - " + a);
+                Console.WriteLine("OutputPath: " + options.OutputFilePath);
+                
                 if (options.AttachDebugger)
                 {
                     Debugger.Launch();

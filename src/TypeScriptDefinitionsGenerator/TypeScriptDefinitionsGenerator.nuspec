@@ -13,8 +13,17 @@
         <releaseNotes />
         <copyright>Copyright 2016</copyright>
         <tags>TypeScript Generation TypeLite</tags>
+
+        <dependencies>
+            <group targetFramework=".NETCoreApp2.0">
+                <dependency id="Microsoft.NETCore.App" version="2.0.0" exclude="Build,Analyzers" />
+                <dependency id="Microsoft.AspNetCore.Mvc.Core" version="2.0.1" exclude="Build,Analyzers" />
+                <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+            </group>
+        </dependencies>
     </metadata>
     <files>
+        <!-- .NET 4.5 -->
         <file src="bin\Release\CommandLine.dll" target="build\net45\CommandLine.dll" />
         <file src="bin\Release\Microsoft.Owin.dll" target="build\net45\Microsoft.Owin.dll" />
         <file src="bin\Release\Microsoft.Owin.Security.dll" target="build\net45\Microsoft.Owin.Security.dll" />
@@ -28,5 +37,13 @@
         <file src="bin\Release\TypeScriptDefinitionsGenerator.pdb" target="build\net45\TypeScriptDefinitionsGenerator.pdb" />
         <file src="build\TypeScriptDefinitionsGenerator.targets" target="build\net45\TypeScriptDefinitionsGenerator.targets" />
         <file src="build\TsGenerator.props" target="content\TsGenerator.props" />
+        
+        <!-- Core stuff -->
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.dll" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.targets" />
+        <file src="bin\Release\CommandLine.dll" target="build\netcoreapp2.0\CommandLine.dll" />
+        <file src="bin\Release\TypeLite.dll" target="build\netcoreapp2.0\TypeLite.dll" />
     </files>
+
 </package>
