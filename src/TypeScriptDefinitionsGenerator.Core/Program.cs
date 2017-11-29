@@ -29,9 +29,13 @@ namespace TypeScriptDefinitionsGenerator.Core
             var options = new Options();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
+                Console.WriteLine("Assemblies: ");
+                foreach (var a in options.Assemblies) Console.WriteLine(" - " + a);
+                Console.WriteLine("OutputPath: " + options.OutputFilePath);
+                
                 if (options.AttachDebugger)
                 {
-                    Debugger.Launch();
+                    //Debugger.Launch();
                     Debugger.Break();
                 }
                 // Create and empty working folder
@@ -266,7 +270,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                         var url = _urlGenerator.GetUrl(action);
                         // allow ajax options to be passed in to override defaults
                         output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
-                            actionName, GetMethodParameters(actionParameters, "RequestInit"), returnType);
+                            actionName, GetMethodParameters(actionParameters, "RequestInit|null"), returnType);
                         output.AppendFormat("      const options: RequestInit = {{ \r\n        method: \"{0}\", \r\n", httpMethod);
                         output.AppendFormat("        body: {0} ? json({0}) : null\r\n", dataParameterName);
                         output.AppendLine("      };");
