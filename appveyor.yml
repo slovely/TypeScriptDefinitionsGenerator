@@ -27,7 +27,7 @@ artifacts:
   name: nuget-package
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/slovely/api/v3/package
+  server: https://www.myget.org/F/slovely/api/v2/package
   api_key:
     secure: XuYyyaeFcL6jP01TpP/tsclgHxby0pk2Gm0VBglwzikpjqbzstw7G+EpD8gRMO7f
   artifact: nuget-package
