@@ -44,6 +44,8 @@
         <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.targets" />
         <file src="bin\Release\CommandLine.dll" target="build\netcoreapp2.0\CommandLine.dll" />
         <file src="bin\Release\TypeLite.dll" target="build\netcoreapp2.0\TypeLite.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.0\*.*" target="build\netcoreapp2.0\" />
+        <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\net46\*.*" target="build\net46\" />
     </files>
 
 </package>

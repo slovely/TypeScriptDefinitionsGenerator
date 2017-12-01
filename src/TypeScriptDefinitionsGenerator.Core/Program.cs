@@ -49,7 +49,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                 }
                 try
                 {
-                    // TODO: Inspect the <assembly>.runtimeconfig.dev.json file to find places where packages can be loaded
+                    // TODO: Inspect the <assembly>.runtimeconfig.dev.json file to find places where packages can be loaded (see DependencyContext API?)
                     GenerateTypeScriptContracts(options);
                 }
                 catch (ReflectionTypeLoadException ex)

@@ -7,6 +7,8 @@
     <TsGenWebApiMethods>true</TsGenWebApiMethods>
     <!-- Set to true to use your own service caller -->
     <TsGenSuppressDefaultServiceCaller>false</TsGenSuppressDefaultServiceCaller>
+    <!-- Set to Default for jquery style, or Aurelia to use aurelia http-fetch-client --> 
+    <TsGenApiMethodStyle>Default</TsGenApiMethodStyle>
   </PropertyGroup>
 
   <!-- Specify paths to the DLL(s) containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
