@@ -28,10 +28,11 @@
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
       <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
+      <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle)</ExecCmd>
+      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>

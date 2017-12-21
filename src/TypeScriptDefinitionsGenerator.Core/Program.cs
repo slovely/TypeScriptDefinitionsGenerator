@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TypeLite;
+using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 
 namespace TypeScriptDefinitionsGenerator.Core
@@ -25,6 +26,7 @@ namespace TypeScriptDefinitionsGenerator.Core
         {
             Console.WriteLine("==============" + AppDomain.CurrentDomain.BaseDirectory);
             Console.WriteLine("TypeScriptGenerator.Core Stated: " + DateTime.Now.ToString("HH:mm:ss"));
+            Console.WriteLine("CommandLine: " + string.Join(" ", args));
 
             var options = new Options();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
@@ -35,7 +37,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                 
                 if (options.AttachDebugger)
                 {
-                    //Debugger.Launch();
+                    Debugger.Launch();
                     Debugger.Break();
                 }
                 // Create and empty working folder
@@ -161,13 +163,38 @@ namespace TypeScriptDefinitionsGenerator.Core
             }
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
+            tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ", StringComparison.InvariantCultureIgnoreCase);
+            tsEnumDefinitions = "import * as Enums from \"../server/enums\";\r\n\r\n" + tsEnumDefinitions;
             File.WriteAllText(Path.Combine(options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
-            //Generate interface definitions for all classes
-            var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
-            File.WriteAllText(Path.Combine(options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
+
+            if (options.GenerateAsModules)
+            {
+                //Generate interface definitions for all classes
+                generator.WithMemberTypeFormatter((p, n) =>
+                {
+                    var asCollection = p.PropertyType as TsCollection;
+                    var isCollection = asCollection != null;
+
+                    if (isCollection)
+                    {
+                        return n + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
+                    }
+                    return p.PropertyType is TsEnum ? "Enums." + n : n;
+                });
+                var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
+                tsClassDefinitions = "import * as Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
+                tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
+                tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
+                File.WriteAllText(Path.Combine(options.OutputFilePath, "classes.ts"), tsClassDefinitions);
+            }
+            else
+            {
+                var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
+                File.WriteAllText(Path.Combine(options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
+            }
         }
-        
+
         private static bool IncludedNamespace(Options options, Type t)
         {
             return options.Namespaces.Any(n => Regex.IsMatch((t.Namespace ?? ""), WildcardToRegex(n)));
@@ -247,7 +274,8 @@ namespace TypeScriptDefinitionsGenerator.Core
         {
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
             output.AppendLine("import {HttpClient, json} from \"aurelia-fetch-client\";\r\n");
-
+            var requiredImports = new HashSet<string>();
+            
             foreach (var assemblyName in options.Assemblies)
             {
                 var assembly = Assembly.LoadFrom(assemblyName);
@@ -255,6 +283,7 @@ namespace TypeScriptDefinitionsGenerator.Core
 
                 foreach (var controller in controllers)
                 {
+                    requiredImports.Add(controller.Namespace.Split(".")[0]);
                     var actions = controller.GetMethods()
                         .Where(m => m.IsPublic)
                         .Where(m => m.DeclaringType == controller)
@@ -278,8 +307,25 @@ namespace TypeScriptDefinitionsGenerator.Core
                         var httpMethod = GetHttpMethod(action);
                         var actionName = GetActionName(action);
                         var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
-
+                        if (returnType.Contains("."))
+                        {
+                            foreach (var s in GetTopLevelNamespaces(returnType))
+                            {
+                                requiredImports.Add(s);                                
+                            }
+                        }
+                        
                         var actionParameters = GetActionParameters(action);
+                        actionParameters.ForEach(a =>
+                        {
+                            if (a.Type.Contains("."))
+                            {
+                                foreach (var s in GetTopLevelNamespaces(a.Type))
+                                {
+                                    requiredImports.Add(s);                                
+                                }
+                            }
+                        });                      
                         var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
                         var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
                         var url = _urlGenerator.GetUrl(action);
@@ -301,7 +347,29 @@ namespace TypeScriptDefinitionsGenerator.Core
                 }
             }
 
+            if (options.GenerateAsModules)
+            {
+                var imports = new StringBuilder();
+                imports.AppendLine("import Classes = require(\"./classes\");");
+                foreach (var ns in requiredImports)
+                {
+                    imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);
+                }
+                imports.AppendLine();
+                output.Insert(0, imports.ToString());
+            }
             File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
+        }
+
+        private static string[] GetTopLevelNamespaces(string typeScriptType)
+        {
+            var startIndex = typeScriptType.IndexOf("<") + 1;
+            var count = typeScriptType.Length;
+            if (startIndex > 0) count = typeScriptType.LastIndexOf(">") - startIndex;
+            typeScriptType = typeScriptType.Substring(startIndex, count);
+
+            var parts = typeScriptType.Split(",");
+            return parts.Select(p => p.Split(".")[0]).ToArray();
         }
 
         private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType)

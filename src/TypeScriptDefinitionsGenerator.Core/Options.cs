@@ -23,6 +23,8 @@ namespace TypeScriptDefinitionsGenerator.Core
         public bool AttachDebugger { get; set; }
         [Option("suppressdefaultservicecaller", HelpText = "Don't use the default service caller (that uses JQuery ajax methods)", DefaultValue = false)]
         public bool SuppressDefaultServiceCaller { get; set; }
+        [Option("generateasmodules", HelpText = "Generates classes/enums/actions using exported modules", DefaultValue = false)]
+        public bool GenerateAsModules { get; set; }
     }
 
     public enum ActionsStyle
