@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -131,6 +132,8 @@ namespace TypeScriptDefinitionsGenerator.Core
                         .Where(m => !typeof(IActionResult).IsAssignableFrom(m.ReturnType))
                         .Where(m => !typeof(Task<IActionResult>).IsAssignableFrom(m.ReturnType))
                         .Where(m => !typeof(Task<ActionResult>).IsAssignableFrom(m.ReturnType))
+                        .Where(m => !typeof(HttpResponseMessage).IsAssignableFrom(m.ReturnType))
+                        .Where(m => !typeof(Task<HttpResponseMessage>).IsAssignableFrom(m.ReturnType))
                         .Where(m => m.DeclaringType == c));
                 ProcessMethods(actions, generator);
 
@@ -336,9 +339,16 @@ namespace TypeScriptDefinitionsGenerator.Core
                         output.AppendFormat("        body: {0} ? json({0}) : null\r\n", dataParameterName);
                         output.AppendLine("      };");
                         output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
-                        output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                            "        .then(response => (response && response.status!==204) ? response.json() : null);\r\n",
-                            url);
+                        if (returnType == "string")
+                        {
+                            output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
+                                                "        .then(response => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
+                        }
+                        else
+                        {
+                            output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
+                                                "        .then(response => (response && response.status!==204) ? response.json() : null);\r\n", url);
+                        }
                         output.AppendLine("    }");
                         output.AppendLine();
                     }

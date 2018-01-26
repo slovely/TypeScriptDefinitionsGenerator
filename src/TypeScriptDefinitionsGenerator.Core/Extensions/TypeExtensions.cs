@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TypeScriptDefinitionsGenerator.Core.Extensions
 {
@@ -40,5 +41,11 @@ namespace TypeScriptDefinitionsGenerator.Core.Extensions
             return type.GetGenericArguments().Single();
         }
 
+        public static bool IsActionResult(this Type type)
+        {
+            return typeof(IActionResult).IsAssignableFrom(type)
+                   || typeof(Task<IActionResult>).IsAssignableFrom(type)
+                   || typeof(Task<ActionResult>).IsAssignableFrom(type);
+        }
     }
 }

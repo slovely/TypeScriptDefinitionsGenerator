@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 
 namespace TypeScriptDefinitionsGenerator.Core
@@ -58,6 +60,11 @@ namespace TypeScriptDefinitionsGenerator.Core
             if (_cache.TryGetValue(clrType, out result))
             {
                 return result;
+            }
+            // If (I)ActionResult, then we can't know what the type is, so use any.
+            if (clrType.IsActionResult() || typeof(HttpResponseMessage).IsAssignableFrom(clrType))
+            {
+                return "any";
             }
 
             // Dictionaries -- these should come before IEnumerables, because they also implement IEnumerable
