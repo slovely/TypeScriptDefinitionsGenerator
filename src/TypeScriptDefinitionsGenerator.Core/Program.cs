@@ -181,7 +181,18 @@ namespace TypeScriptDefinitionsGenerator.Core
 
                     if (isCollection)
                     {
-                        return n + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
+                        var genericArguments = asCollection.ItemsType.Type.GetGenericArguments();
+                        foreach (var arg in genericArguments)
+                        {
+                            // Really horrible hack... prefix enum generic parameters with 'Enum.'.  Makes things like Dictionary<string, AnEnum> work.
+                            if (arg.IsEnum)
+                            {
+                                Console.WriteLine("***Replacing " + arg.FullName);
+                                n = n.Replace(arg.FullName, "Enums." + arg.FullName);
+                            }
+                        }
+
+                        return (asCollection.ItemsType is TsEnum ? "Enums." + n : n) + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
                     }
                     return p.PropertyType is TsEnum ? "Enums." + n : n;
                 });
@@ -278,7 +289,10 @@ namespace TypeScriptDefinitionsGenerator.Core
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
             output.AppendLine("import {HttpClient, json} from \"aurelia-fetch-client\";\r\n");
             var requiredImports = new HashSet<string>();
-            
+
+            //TODO: allow this is be configured
+            output.Append(_interfaces);
+
             foreach (var assemblyName in options.Assemblies)
             {
                 var assembly = Assembly.LoadFrom(assemblyName);
