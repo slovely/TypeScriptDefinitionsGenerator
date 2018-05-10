@@ -1,6 +1,6 @@
 ﻿namespace SampleWebsite.MoreModels
 {
-    public class SecondaryModelLibraray
+    public class SecondaryModelLibrary
     {
         public string StringProperty { get; set; }
     }

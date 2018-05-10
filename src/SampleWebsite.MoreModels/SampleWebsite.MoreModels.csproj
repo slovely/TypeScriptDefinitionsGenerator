@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Nested\NestedModel.cs" />
-    <Compile Include="SecondaryModelLibraray.cs" />
+    <Compile Include="SecondaryModelLibrary.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
