@@ -54,7 +54,7 @@ namespace TypeScriptDefinitionsGenerator
                             GenerateWebApiActions(options);
                             break;
                         case ActionsStyle.Aurelia:
-                            GenerateAureliWebApiActions(options);
+                            GenerateAureliaWebApiActions(options);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -234,7 +234,7 @@ namespace TypeScriptDefinitionsGenerator
             }
         }
 
-        private static void GenerateAureliWebApiActions(Options options)
+        private static void GenerateAureliaWebApiActions(Options options)
         {
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
             output.AppendLine("import {HttpClient, json} from \"aurelia-fetch-client\";\r\n");
