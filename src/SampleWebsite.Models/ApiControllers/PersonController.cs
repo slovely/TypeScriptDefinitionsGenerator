@@ -9,7 +9,7 @@ namespace SampleWebsite.Models.ApiControllers
         {
             return new Person { Name = "Fred Flintstone", Gender = Gender.Male };
         }
-        
+
         [HttpGet]
         [Route("api/custom/{personid}/load")]
         public Person GetPersonCustom(int personid)

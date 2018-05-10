@@ -27,6 +27,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -161,7 +162,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -264,10 +264,4 @@
     <Error Condition="!Exists('..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\TypeScriptDefinitionsGenerator.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\TypeScriptDefinitionsGenerator.targets'))" />
   </Target>
   <Import Project="..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\TypeScriptDefinitionsGenerator.targets" Condition="Exists('..\packages\TypeScriptDefinitionsGenerator.1.0.34\build\net45\TypeScriptDefinitionsGenerator.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target> -->
 </Project>
