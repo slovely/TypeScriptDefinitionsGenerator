@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using TypeScriptDefinitionsGenerator;
-using TypeScriptDefinitionsGenerator.Extensions;
 using Xunit;
 
 namespace TypeScriptGenerator.Tests
@@ -10,7 +9,7 @@ namespace TypeScriptGenerator.Tests
     public class WebApiUrlGenerationTests
     {
         private readonly WebApiUrlGenerator _generator = new WebApiUrlGenerator();
-        
+
         [Fact]
         public void ControllerActionId_Routes()
         {
@@ -44,7 +43,7 @@ namespace TypeScriptGenerator.Tests
             var url = _generator.GetUrl(method);
             Assert.Equal("\"api/custom\"", url);
         }
-        
+
         [Fact]
         public void CustomRouteAttributeWithParameters()
         {
@@ -76,7 +75,7 @@ namespace TypeScriptGenerator.Tests
             var url = _generator.GetUrl(method);
             Assert.Equal("\"api/v1/flights/\" + flightIdentifier + \"/flightdetails\"", url);
         }
-        
+
         private MethodInfo GetMethodInfo<TCtrl>(Expression<Action<TCtrl>> expression)
         {
             return ((MethodCallExpression) expression.Body).Method;
