@@ -287,7 +287,7 @@ namespace TypeScriptDefinitionsGenerator.Core
         private static void GenerateAureliWebApiActions(Options options)
         {
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
-            output.AppendLine("import {HttpClient, json} from \"aurelia-fetch-client\";\r\n");
+            output.AppendLine("import {HttpClient, json, RequestInit} from \"aurelia-fetch-client\";\r\n");
             var requiredImports = new HashSet<string>();
 
             //TODO: allow this is be configured
@@ -348,20 +348,20 @@ namespace TypeScriptDefinitionsGenerator.Core
                         var url = _urlGenerator.GetUrl(action);
                         // allow ajax options to be passed in to override defaults
                         output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
-                            actionName, GetMethodParameters(actionParameters, "RequestInit|null"), returnType);
+                            actionName, GetMethodParameters(actionParameters, "RequestInit|undefined", true), returnType);
                         output.AppendFormat("      const options: RequestInit = {{ \r\n        method: \"{0}\", \r\n", httpMethod);
-                        output.AppendFormat("        body: {0} ? json({0}) : null\r\n", dataParameterName);
+                        output.AppendFormat("        body: {0} ? json({0}) : undefined\r\n", dataParameterName);
                         output.AppendLine("      };");
                         output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
                         if (returnType == "string")
                         {
                             output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                                "        .then(response => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
                         }
                         else
                         {
                             output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                                "        .then(response => (response && response.status!==204) ? response.json() : null);\r\n", url);
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.json() : null);\r\n", url);
                         }
                         output.AppendLine("    }");
                         output.AppendLine();
@@ -396,11 +396,11 @@ namespace TypeScriptDefinitionsGenerator.Core
             return parts.Select(p => p.Split(".")[0]).ToArray();
         }
 
-        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType)
+        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
         {
             var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + a.Type));
             if (result != "") result += ", ";
-            result += "ajaxOptions: " + settingsType + " = null";
+            result += "ajaxOptions: " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
             return result;
         }
 
