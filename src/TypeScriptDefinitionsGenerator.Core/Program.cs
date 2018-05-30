@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using TypeLite;
 using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
+using TypeScriptDefinitionsGenerator.Core.SignalR;
 
 namespace TypeScriptDefinitionsGenerator.Core
 {
@@ -66,9 +67,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                                       "use the deps.json / runtimeconfig.json files to load referenced assemblies automatically.");
                     throw;
                 }
-                /*
                 GenerateSignalrHubs(options);
-                */
                 if (options.GenerateWebApiActions)
                 {
                     switch (options.ActionsStyle)
@@ -137,8 +136,6 @@ namespace TypeScriptDefinitionsGenerator.Core
                         .Where(m => m.DeclaringType == c));
                 ProcessMethods(actions, generator);
 
-                /*
-                 * TODO: Re-instate signalR generation
                 var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i.FullName.Contains(SignalRGenerator.IHUB_TYPE)));
                 var methods = signalrHubs
                     .SelectMany(h => h.GetMethods()
@@ -153,7 +150,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                         .Where(m => m.IsPublic)
                         .Where(m => m.DeclaringType == h));
                 ProcessMethods(clientMethods, generator);
-*/
+
                 // Add all classes that are declared inside the specified namespace
                 if (options.Namespaces != null && options.Namespaces.Any())
                 {
@@ -326,7 +323,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                         var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
                         if (returnType.Contains("."))
                         {
-                            foreach (var s in GetTopLevelNamespaces(returnType))
+                            foreach (var s in returnType.GetTopLevelNamespaces())
                             {
                                 requiredImports.Add(s);                                
                             }
@@ -337,7 +334,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                         {
                             if (a.Type.Contains("."))
                             {
-                                foreach (var s in GetTopLevelNamespaces(a.Type))
+                                foreach (var s in a.Type.GetTopLevelNamespaces())
                                 {
                                     requiredImports.Add(s);                                
                                 }
@@ -383,17 +380,6 @@ namespace TypeScriptDefinitionsGenerator.Core
                 output.Insert(0, imports.ToString());
             }
             File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
-        }
-
-        private static string[] GetTopLevelNamespaces(string typeScriptType)
-        {
-            var startIndex = typeScriptType.IndexOf("<") + 1;
-            var count = typeScriptType.Length;
-            if (startIndex > 0) count = typeScriptType.LastIndexOf(">") - startIndex;
-            typeScriptType = typeScriptType.Substring(startIndex, count);
-
-            var parts = typeScriptType.Split(",");
-            return parts.Select(p => p.Split(".")[0]).ToArray();
         }
 
         private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
@@ -506,7 +492,21 @@ namespace TypeScriptDefinitionsGenerator.Core
             var inputTypes = methods.SelectMany(m => m.GetParameters()).Select(p => p.ParameterType);
             ProcessTypes(inputTypes, generator);
         }
-        
+
+        private static void GenerateSignalrHubs(Options options)
+        {
+            var allOutput = new StringBuilder();
+            foreach (var assemblyName in options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                allOutput.Append(new SignalRGenerator().GenerateHubs(assembly, options.GenerateAsModules));
+            }
+            // Don't create the output if we don't have any hubs!
+            if (allOutput.Length == 0) return;
+
+            File.WriteAllText(Path.Combine(options.OutputFilePath, "hubs.d.ts"), allOutput.ToString());
+        }
+
         private static string _interfaces = @"
   export interface IDictionary<T> {
      [key: string]: T;
