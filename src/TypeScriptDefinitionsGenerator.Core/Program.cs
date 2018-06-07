@@ -353,12 +353,12 @@ namespace TypeScriptDefinitionsGenerator.Core
                         if (returnType == "string")
                         {
                             output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                                "        .then((response: Response) => (response && response.status!==204 && response.bodyUsed) ? response.text() : \"\");\r\n", url);
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
                         }
                         else
                         {
                             output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                                "        .then((response: Response) => (response && response.status!==204 && response.bodyUsed) ? response.json() : null);\r\n", url);
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.json() : null);\r\n", url);
                         }
                         output.AppendLine("    }");
                         output.AppendLine();
