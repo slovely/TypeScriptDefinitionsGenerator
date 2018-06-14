@@ -9,8 +9,8 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
 {
     public class SignalRGenerator
     {
-        public const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
-        public const string IHUB_TYPE = "Microsoft.AspNet.SignalR.Hubs.IHub";
+        public const string HUB_TYPE = "Microsoft.AspNetCore.SignalR.Hub";
+        public const string IHUB_TYPE = "Microsoft.AspNetCore.SignalR.Hubs.IHub";
 
         public string GenerateHubs(Assembly assembly, bool generateAsModules)
         {
@@ -19,7 +19,12 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
                 .OrderBy(t => t.FullName)
                 .ToList();
 
-            if (!hubs.Any()) return "";
+            if (!hubs.Any())
+            {
+                Console.WriteLine("No SignalR hubs found");
+                return "";
+            }
+            Console.WriteLine(hubs.Count + " SignalR hubs found");
             var requiredImports = new HashSet<string>();
             foreach (var hub in hubs)
             {
@@ -28,16 +33,6 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
 
             var scriptBuilder = new ScriptBuilder("    ");
 
-            // Output signalR style promise interface:
-            if (generateAsModules) scriptBuilder.Append("export ");
-            scriptBuilder.AppendLine("interface ISignalRPromise<T> {");
-            using (scriptBuilder.IncreaseIndentation())
-            {
-                scriptBuilder.AppendLineIndented("done(cb: (result: T) => any): ISignalRPromise<T>;");
-                scriptBuilder.AppendLineIndented("error(cb: (error: any) => any): ISignalRPromise<T>;");
-
-            }
-            scriptBuilder.AppendLineIndented("}");
             scriptBuilder.AppendLine();
 
             hubs.ForEach(h => GenerateHubInterfaces(h, scriptBuilder, generateAsModules, requiredImports));
@@ -135,7 +130,7 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
             }));
             
             var returnTypeName = TypeConverter.GetTypeScriptName(methodInfo.ReturnType);
-            returnTypeName = returnTypeName == "void" ? "void" : "ISignalRPromise<" + returnTypeName + ">";
+            returnTypeName = returnTypeName == "void" ? "void" : "Promise<" + returnTypeName + ">";
             foreach (var ns in returnTypeName.GetTopLevelNamespaces())
             {
                 requiredImports.Add(ns);
