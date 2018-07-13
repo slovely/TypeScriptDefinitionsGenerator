@@ -109,11 +109,18 @@ By setting TsGenWebApiMethods=Aurelia, the generated methods will use the Aureli
 ```
 
 The generation currently only works with actions using the {controller}/{action}/{id} route format, or if the method has a custom `[RouteAttribute]`.  
- 
- 
+
 ##### Multiple Assemblies
 When using multiple assemblies, to avoid a whole world of pain, ensure that all any dependencies shared between the assemblies are the same version (e.g. if you reference JSON.NET v9.0.0 in one project, make sure the other project references v9.0.0 as well).
 
+### ASPNET CORE v2
+Since v.1.0.57, very early support for ASP.Net Core (v2 only) is included.  The instructions for running it are the same as above, but a couple of additional steps are required:
+- You need to add the `TsGenerator.props` file to the root of your web project manually
+- The assemblies containing your WebAPI methods must have `<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>` added to the csproj to allow them to be loaded via reflection.  Looks like something can be done to avoid that with the DependencyContext stuff, but I haven't looked into it yet.
+
+**NOTE**: Because there is no way to know if an action is MVC or WebAPI in Core, the generator assumes actions that return `IActionResult` are for returning MVC views and will be excluded.
+Also, there is no support for API methods that don't have the route: `api/{controller}/{action}` which is obviously pretty limiting unfortunately.
+ 
 ### Thanks
 Massive thanks go to [Lukas Kabrt](https://bitbucket.org/LukasKabrt/) for his wonderful [TypeLite](https://bitbucket.org/LukasKabrt/typelite/) library which does the bulk of the 
 TypeScript generation.  I am pleased that I was able to contribute the first version of generics support to his project while making this project.
