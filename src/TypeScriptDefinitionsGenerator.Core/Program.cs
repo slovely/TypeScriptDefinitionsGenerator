@@ -136,7 +136,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                         .Where(m => m.DeclaringType == c));
                 ProcessMethods(actions, generator);
 
-                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i.FullName.Contains(SignalRGenerator.IHUB_TYPE)));
+                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName.Contains(SignalRGenerator.IHUB_TYPE)));
                 var methods = signalrHubs
                     .SelectMany(h => h.GetMethods()
                         .Where(m => m.IsPublic)
