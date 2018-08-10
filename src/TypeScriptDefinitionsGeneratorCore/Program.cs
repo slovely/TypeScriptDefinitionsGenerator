@@ -267,6 +267,10 @@ namespace TypeScriptDefinitionsGeneratorCore
                         var httpMethod = GetHttpMethod(action);
                         var actionName = GetActionName(action);
                         var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
+                        if (returnType == "Microsoft.AspNetCore.Mvc.ActionResult" || returnType == "Microsoft.AspNetCore.Mvc.IActionResult")
+                        {
+                            continue;
+                        }
 
                         var actionParameters = GetActionParameters(action);
                         var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
