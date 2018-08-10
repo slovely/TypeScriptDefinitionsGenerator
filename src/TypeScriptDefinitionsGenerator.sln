@@ -1,16 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4E81AA1-2F04-4C30-8FED-33D455A7C7B8}"
-	ProjectSection(SolutionItems) = preProject
-		..\readme.md = ..\readme.md
-		TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.nuspec = TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.nuspec
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite", "SampleWebsite\SampleWebsite.csproj", "{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.Models", "SampleWebsite.Models\SampleWebsite.Models.csproj", "{9F338FE9-45C5-432A-93AB-8827402747BA}"
@@ -19,16 +11,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWebsite.MoreModels", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptGenerator.Tests", "TypeScriptGenerator.Tests\TypeScriptGenerator.Tests.csproj", "{E9853A84-18C9-4419-9F70-BD6F54E2563A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGeneratorCore", "TypeScriptDefinitionsGeneratorCore\TypeScriptDefinitionsGeneratorCore.csproj", "{43C371CE-BB65-4A50-B75C-D0F8ED9E5468}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,8 +37,19 @@ Global
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C371CE-BB65-4A50-B75C-D0F8ED9E5468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C371CE-BB65-4A50-B75C-D0F8ED9E5468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C371CE-BB65-4A50-B75C-D0F8ED9E5468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C371CE-BB65-4A50-B75C-D0F8ED9E5468}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {34F82AD2-4DEB-4847-8463-8ED33AA91E57}
 	EndGlobalSection
 EndGlobal

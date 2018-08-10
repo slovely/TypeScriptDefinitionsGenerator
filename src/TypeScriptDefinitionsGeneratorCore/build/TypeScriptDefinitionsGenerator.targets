@@ -1,0 +1,83 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+
+  <Import Project="$(ProjectDir)TsGenerator.props" />
+  
+  <PropertyGroup>
+    <!-- The assembly containing inline task support is different in VS 2013 and 2015. -->
+    <InlineTasksAssemblyFile Condition="'$(MSBuildToolsVersion)' == '14.0'">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</InlineTasksAssemblyFile>
+    <InlineTasksAssemblyFile Condition="'$(MSBuildToolsVersion)' != '14.0'">$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll</InlineTasksAssemblyFile>
+  </PropertyGroup>
+
+  <!--Simple inline task to create -n [ns1] [ns2]...[nsN] namespaces parameter-->
+  <UsingTask
+    TaskName="CreateMulitpleParameterString"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(InlineTasksAssemblyFile)"
+    >
+    <ParameterGroup>
+      <Values Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <ArgumentName Required="true" ParameterType="System.String" />
+      <Parameter Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs">
+        <![CDATA[
+            using System;
+            using System.Linq;
+            using Microsoft.Build.Framework;
+            using Microsoft.Build.Utilities;
+
+            public class CreateMulitpleParameterString : Task
+            {  
+                public string ArgumentName { get; set; }
+            
+                public ITaskItem[] Values { get; set; }
+                
+                [Output]
+                public string Parameter { get; set; }
+
+                public override bool Execute()
+                {
+                    Parameter = "";
+                    
+                    if (Values == null || !Values.Any()) return true;
+                
+                    Parameter = ArgumentName + " ";
+                    Parameter += string.Join(",", Values.Where(n => !string.IsNullOrWhiteSpace(n.ItemSpec)).Select(n => n.ItemSpec));
+                    return true;
+                }
+            }
+
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  
+  <Target Name="AfterResolveReferences">
+
+    <CreateMulitpleParameterString Values="@(TsNamespaces)" ArgumentName="-n">
+      <Output TaskParameter="Parameter" PropertyName="NamespacesParam"></Output>
+    </CreateMulitpleParameterString>
+
+    <CreateMulitpleParameterString Values="@(TsGenInputAssembly)" ArgumentName="-a">
+      <Output TaskParameter="Parameter" PropertyName="InputAssembliesParam"></Output>
+    </CreateMulitpleParameterString>
+    
+    <PropertyGroup>
+      <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
+      <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
+      <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
+      <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
+
+      <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
+
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle)</ExecCmd>
+    </PropertyGroup>
+
+    <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
+    <Message Text="TypeScriptGenerator Working Folder: $(ProjectDir)"></Message>
+    <Exec Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
+    
+  </Target>
+
+</Project>

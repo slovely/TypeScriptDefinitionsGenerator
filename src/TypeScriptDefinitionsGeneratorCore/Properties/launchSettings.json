@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "TypeScriptDefinitionsGeneratorCore": {
+      "commandName": "Project",
+      "commandLineArgs": "-a ..\\Allocator.Core\\bin\\Release\\netcoreapp2.1\\Allocator.Core.dll -o ClientApp\\app\\server --webapiactions --suppressdefaultservicecaller --actionsstyle Aurelia --debugger",
+      "workingDirectory": "C:\\Git\\tasks\\Allocator\\Allocator\\"
+    }
+  }
+}
