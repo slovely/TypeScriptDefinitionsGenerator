@@ -1,0 +1,23 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- Specify the path to output the generated TypeScript (relative to the current project directory) -->
+    <TsGenOutputFolder>scripts\server</TsGenOutputFolder>
+    <!-- true/false - indicates whether WebApi action methods should be generated -->
+    <TsGenWebApiMethods>true</TsGenWebApiMethods>
+    <!-- Set to true to use your own service caller -->
+    <TsGenSuppressDefaultServiceCaller>false</TsGenSuppressDefaultServiceCaller>
+  </PropertyGroup>
+
+  <!-- Specify paths to the DLL(s) containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
+  <ItemGroup>
+    <TsGenInputAssembly Include="---INSERT PATH TO DLL HERE---" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Add namespaces here to also include them in the generation - useful if they are used from MVC or (shudder) WebForms requests which the generator can't determine itself. -->
+    <!-- Use '%%' to match recursively  (e.g. Include="MyNamespace.Models%%" ... wanted it to be '*' but thanks to MSBuild that was scuppered) -->
+    <!--<TsNamespaces Include=""></TsNamespaces>-->
+  </ItemGroup>
+
+</Project>
