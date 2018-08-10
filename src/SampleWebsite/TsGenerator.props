@@ -8,7 +8,8 @@
     <!-- true/false - allows debugging of the generation -->
     <TsGenDebug>false</TsGenDebug>
     <!-- Set to true to use your own service caller -->
-    <TsGenSuppressDefaultServiceCaller>false</TsGenSuppressDefaultServiceCaller>
+    <TsGenSuppressDefaultServiceCaller>true</TsGenSuppressDefaultServiceCaller>
+    <TsGenApiMethodStyle>Default</TsGenApiMethodStyle>
   </PropertyGroup>
 
   <!-- Specify paths to the DLL(s) containing your models, controllers, and/or SignalR hubs (relative to the current project directory) -->
