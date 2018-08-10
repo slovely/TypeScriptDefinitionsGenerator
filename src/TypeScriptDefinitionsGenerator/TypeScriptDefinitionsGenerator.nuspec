@@ -38,13 +38,22 @@
         <file src="build\TypeScriptDefinitionsGenerator.targets" target="build\net45\TypeScriptDefinitionsGenerator.targets" />
         <file src="build\TsGenerator.props" target="content\TsGenerator.props" />
         
-        <!-- Core stuff -->
+        <!-- Core 2.0 stuff -->
         <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.dll" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.dll" />
         <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" />
         <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\netcoreapp2.0\TypeScriptDefinitionsGenerator.targets" />
         <file src="bin\Release\CommandLine.dll" target="build\netcoreapp2.0\CommandLine.dll" />
         <file src="bin\Release\TypeLite.dll" target="build\netcoreapp2.0\TypeLite.dll" />
+
+        <!-- Core 2.1 stuff -->
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.1\TypeScriptDefinitionsGenerator.Core.dll" target="build\netcoreapp2.1\TypeScriptDefinitionsGenerator.Core.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp2.1\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" target="build\netcoreapp2.1\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\netcoreapp2.1\TypeScriptDefinitionsGenerator.targets" />
+        <file src="bin\Release\CommandLine.dll" target="build\netcoreapp2.1\CommandLine.dll" />
+        <file src="bin\Release\TypeLite.dll" target="build\netcoreapp2.1\TypeLite.dll" />
+
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.0\*.*" target="build\netcoreapp2.0\" />
+        <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.1\*.*" target="build\netcoreapp2.1\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\net46\*.*" target="build\net46\" />
     </files>
 
