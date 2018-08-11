@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <Import Project="$(ProjectDir)TsGenerator.props" Condition="Exists('$(ProjectDir)TsGenerator.props')" />
+
+  <PropertyGroup>
+    <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netcoreapp2.0</TaskFolder>
+    <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</TaskFolder>
+    <TaskAssembly>$(MSBuildThisFileDirectory)..\$(TaskFolder)\TypeScriptDefinitionsGenerator.BuildSupport.dll</TaskAssembly>
+  </PropertyGroup>
+
+
+  <UsingTask TaskName="TypeScriptDefinitionsGenerator.BuildSupport.CreateMulitpleParameterString" AssemblyFile="$(TaskAssembly)" />
+
+  <Target Name="AfterResolveReferences">
+    
+    <Error Condition="!Exists('$(ProjectDir)TsGenerator.props')" Text="You must add a TsGenerator.props file to the root of your project.  Please see https://github.com/slovely/TypeScriptDefinitionsGenerator/blob/master/src/TypeScriptDefinitionsGenerator/build/TsGenerator.props for an example." />
+
+    <CreateMulitpleParameterString Values="@(TsNamespaces)" ArgumentName="-n">
+      <Output TaskParameter="Parameter" PropertyName="NamespacesParam"></Output>
+    </CreateMulitpleParameterString>
+
+    <CreateMulitpleParameterString Values="@(TsGenInputAssembly)" ArgumentName="-a">
+      <Output TaskParameter="Parameter" PropertyName="InputAssembliesParam"></Output>
+    </CreateMulitpleParameterString>
+    
+    <PropertyGroup>
+      <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
+      <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
+      <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
+      <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
+      <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
+
+      <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
+
+      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core2_1.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules)</ExecCmd>
+    </PropertyGroup>
+
+    <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
+    <Message Text="TypeScriptGenerator Working Folder: $(ProjectDir)"></Message>
+    <Exec Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
+    
+  </Target>
+
+</Project>
