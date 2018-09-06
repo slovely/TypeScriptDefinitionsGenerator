@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TypeScriptDefinitionsGenerator.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "--"
+    }
+  }
+}

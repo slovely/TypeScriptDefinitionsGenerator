@@ -3,11 +3,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Http;
+using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
 using TypeScriptDefinitionsGenerator.Extensions;
 
 namespace TypeScriptDefinitionsGenerator
 {
-    public class WebApiUrlGenerator
+    public class WebApiUrlGenerator : IUrlGenerator
     {
         public string GetUrl(MethodInfo method)
         {
