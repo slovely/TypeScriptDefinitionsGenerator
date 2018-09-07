@@ -25,6 +25,8 @@ namespace TypeScriptDefinitionsGenerator.Core
         public bool SuppressDefaultServiceCaller { get; set; }
         [Option("generateasmodules", HelpText = "Generates classes/enums/actions using exported modules", DefaultValue = false)]
         public bool GenerateAsModules { get; set; }
+        [Option("camelcase", HelpText = "Generates property names using camel case", DefaultValue = false)]
+        public bool CamelCase { get; set; }
     }
 
     public enum ActionsStyle

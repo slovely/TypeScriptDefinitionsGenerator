@@ -69,10 +69,11 @@
       <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
       <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
-
+      <TsGenCamelCaseNames Condition="'$(TsGenCamelCaseNames)' == 'true'">--camelcase</TsGenCamelCaseNames>
+      
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>

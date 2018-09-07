@@ -87,7 +87,6 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalR\SignalRGenerator.cs" />
     <Compile Include="TypeConverter.cs" />

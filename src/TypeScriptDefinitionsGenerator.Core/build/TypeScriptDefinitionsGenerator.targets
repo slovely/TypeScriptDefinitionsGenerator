@@ -29,15 +29,18 @@
       <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
       <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
+      <TsGenCamelCaseNames Condition="'$(TsGenCamelCaseNames)' == 'true'">--camelcase</TsGenCamelCaseNames>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules)</ExecCmd>
+      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
     <Message Text="TypeScriptGenerator Working Folder: $(ProjectDir)"></Message>
-    <Exec Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
+    <Message Condition="'$(TsGenDisabled)' == 'true'" Importance="High" Text="GENERATION DISABLED!"></Message>
+
+    <Exec Condition="'$(TsGenDisabled)' != 'true'" Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
     
   </Target>
 

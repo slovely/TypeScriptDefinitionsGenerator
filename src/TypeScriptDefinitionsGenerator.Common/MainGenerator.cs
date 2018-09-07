@@ -33,6 +33,11 @@ namespace TypeScriptDefinitionsGenerator.Common
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
+            if (_options.CamelCase)
+            {
+                generator.WithMemberFormatter(i => Char.ToLower(i.Name[0]) + i.Name.Substring(1));
+            }
+
             foreach (var assemblyName in _options.Assemblies)
             {
                 var fi = new FileInfo(assemblyName);
