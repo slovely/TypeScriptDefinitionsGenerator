@@ -26,7 +26,7 @@ namespace TypeScriptDefinitionsGenerator
         private static void Main(string[] args)
         {
             Console.WriteLine("==============" + AppDomain.CurrentDomain.BaseDirectory);
-            Console.WriteLine("TypeScriptGenerator CORE Stated: " + DateTime.Now.ToString("HH:mm:ss"));
+            Console.WriteLine("TypeScriptGenerator DOTNET4.5 Stated: " + DateTime.Now.ToString("HH:mm:ss"));
 
             var options = new Options();
             if (Parser.Default.ParseArguments(args, options))
@@ -62,10 +62,10 @@ namespace TypeScriptDefinitionsGenerator
                     switch (options.ActionsStyle)
                     {
                         case ActionsStyle.Default:
-                            mainGenerator.GenerateWebApiActions(options);
+                            mainGenerator.GenerateWebApiActions();
                             break;
                         case ActionsStyle.Aurelia:
-                            //mainGenerator.GenerateAureliWebApiActions(options);
+                            mainGenerator.GenerateAureliWebApiActions();
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();

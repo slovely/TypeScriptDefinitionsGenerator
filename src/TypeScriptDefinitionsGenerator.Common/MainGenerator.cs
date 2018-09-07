@@ -37,7 +37,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             {
                 var fi = new FileInfo(assemblyName);
                 // Load all input assemblies from the same location to ensure duplicates aren't generated (as the same type loaded from 
-                // two different places will appear to be diffent, so both would otherwise be generated).
+                // two different places will appear to be different, so both would otherwise be generated).
                 var assembly = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, fi.Name));
                 Console.WriteLine("Loaded assembly: " + assemblyName);
 
@@ -52,7 +52,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                     );
                 ProcessMethods(actions, generator);
 
-                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName.Contains(_configuration.SignalRGenerator.IHUB_TYPE)));
+                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
                 var methods = signalrHubs
                     .SelectMany(h => h.GetMethods()
                         .Where(m => m.IsPublic)
@@ -113,11 +113,17 @@ namespace TypeScriptDefinitionsGenerator.Common
                 tsClassDefinitions = "import * as Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
                 tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
+                tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
+                    m => ": {[key: string]: " + m.Groups["v"].Value + "};",
+                    RegexOptions.Multiline);
                 File.WriteAllText(Path.Combine(_options.OutputFilePath, "classes.ts"), tsClassDefinitions);
             }
             else
             {
                 var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
+                tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
+                    m => ": {[key: string]: " + m.Groups["v"].Value + "};",
+                    RegexOptions.Multiline);
                 File.WriteAllText(Path.Combine(_options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
             }
         }
@@ -179,7 +185,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                         generator.ModelBuilder.Add(clrTypeToUse);
                     }
                 }
-                else
+                else if (!typeof(IEnumerable).IsAssignableFrom(clrTypeToUse))
                 {
                     generator.ModelBuilder.Add(clrTypeToUse);
                 }
@@ -200,13 +206,13 @@ namespace TypeScriptDefinitionsGenerator.Common
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "hubs.d.ts"), allOutput.ToString());
         }
 
-        public void GenerateWebApiActions(Options options)
+        public void GenerateWebApiActions()
         {
             var output = new StringBuilder("module Api {");
             //TODO: allow this is be configured
             output.Append(_interfaces);
 
-            foreach (var assemblyName in options.Assemblies)
+            foreach (var assemblyName in _options.Assemblies)
             {
                 var assembly = Assembly.LoadFrom(assemblyName);
                 var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate).OrderBy(t => t.Name);
@@ -249,19 +255,117 @@ namespace TypeScriptDefinitionsGenerator.Common
 
             output.Append("}");
 
-            File.WriteAllText(Path.Combine(options.OutputFilePath, "actions.ts"), output.ToString());
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
 
-            if (!options.SuppressDefaultServiceCaller)
+            if (!_options.SuppressDefaultServiceCaller)
             {
                 // Write the default service caller
                 using (var stream = typeof(MainGenerator).Assembly.GetManifestResourceStream(typeof(MainGenerator).Namespace + ".Resources.ServiceCaller.ts"))
                 using (var reader = new StreamReader(stream))
                 {
-                    File.WriteAllText(Path.Combine(options.OutputFilePath, "servicecaller.ts"), reader.ReadToEnd());
+                    File.WriteAllText(Path.Combine(_options.OutputFilePath, "servicecaller.ts"), reader.ReadToEnd());
+                }
+            }
+        }
+        
+        public void GenerateAureliWebApiActions()
+        {
+            var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
+            output.AppendLine("import {HttpClient, json, RequestInit} from \"aurelia-fetch-client\";\r\n");
+            var requiredImports = new HashSet<string>();
+
+            //TODO: allow this is be configured
+            output.Append(_interfaces);
+
+            foreach (var assemblyName in _options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate).OrderBy(t => t.Name);
+
+                foreach (var controller in controllers)
+                {
+                    requiredImports.Add(controller.Namespace.Split('.')[0]);
+                    var actions = controller.GetMethods()
+                        .Where(_configuration.ActionsPredicate)
+                        .Where(m => m.DeclaringType == controller)
+                        .OrderBy(m => m.Name);
+
+                    if (!actions.Any()) continue;
+                    var controllerName = controller.Name.Replace("Controller", "");
+                    output.AppendLine("  @autoinject");
+                    output.AppendFormat("  export class {0} {{\r\n", controllerName);
+                    output.AppendLine("    constructor(private http: HttpClient) {");
+                    output.AppendLine("    }");
+
+                    // TODO: WebAPI supports multiple actions with the same name but different parameters - this doesn't!
+                    foreach (var action in actions)
+                    {
+                        if (NotAnAction(action)) continue;
+
+                        var httpMethod = GetHttpMethod(action);
+                        var actionName = GetActionName(action);
+                        var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
+                        if (returnType.Contains("."))
+                        {
+                            foreach (var s in returnType.GetTopLevelNamespaces())
+                            {
+                                requiredImports.Add(s);                                
+                            }
+                        }
+                        
+                        var actionParameters = _configuration.GetActionParameters(action);
+                        actionParameters.ForEach(a =>
+                        {
+                            if (a.Type.Contains("."))
+                            {
+                                foreach (var s in a.Type.GetTopLevelNamespaces())
+                                {
+                                    requiredImports.Add(s);                                
+                                }
+                            }
+                        });                      
+                        var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
+                        var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
+                        var url = _configuration.UrlGenerator.GetUrl(action);
+                        // allow ajax options to be passed in to override defaults
+                        output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
+                            actionName, GetMethodParameters(actionParameters, "RequestInit|undefined", true), returnType);
+                        output.AppendFormat("      const options: RequestInit = {{ \r\n        method: \"{0}\", \r\n", httpMethod);
+                        output.AppendFormat("        body: {0} ? json({0}) : undefined\r\n", dataParameterName);
+                        output.AppendLine("      };");
+                        output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
+                        if (returnType == "string")
+                        {
+                            output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
+                        }
+                        else
+                        {
+                            output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
+                                                "        .then((response: Response) => (response && response.status!==204) ? response.json() : null);\r\n", url);
+                        }
+                        output.AppendLine("    }");
+                        output.AppendLine();
+                    }
+
+                    output.AppendLine("  }");
                 }
             }
 
+            if (_options.GenerateAsModules)
+            {
+                var imports = new StringBuilder();
+                imports.AppendLine("import Classes = require(\"./classes\");");
+                foreach (var ns in requiredImports)
+                {
+                    imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);
+                }
+                imports.AppendLine();
+                output.Insert(0, imports.ToString());
+            }
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
         }
+
 
         private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
         {

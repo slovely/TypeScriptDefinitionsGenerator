@@ -68,15 +68,18 @@
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
       <!-- Default/Aurelia - indicates whether default (JQuery) or Aurelia action methods should be generated -->
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
+      <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
     <Message Text="TypeScriptGenerator Working Folder: $(ProjectDir)"></Message>
-    <Exec Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
+    <Message Condition="'$(TsGenDisabled)' == 'true'" Importance="High" Text="GENERATION DISABLED!"></Message>
+
+    <Exec Condition="'$(TsGenDisabled)' != 'true'" Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
     
   </Target>
 
