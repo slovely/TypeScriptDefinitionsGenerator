@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Http;
+using TypeScriptDefinitionsGenerator.Common;
 using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
 using TypeScriptDefinitionsGenerator.Extensions;
 

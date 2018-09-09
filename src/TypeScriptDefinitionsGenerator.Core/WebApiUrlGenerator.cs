@@ -3,11 +3,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
+using TypeScriptDefinitionsGenerator.Common;
+using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 
 namespace TypeScriptDefinitionsGenerator.Core
 {
-    public class WebApiUrlGenerator
+    public class WebApiUrlGenerator : IUrlGenerator
     {
         public string GetUrl(MethodInfo method)
         {

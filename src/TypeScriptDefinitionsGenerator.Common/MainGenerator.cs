@@ -27,6 +27,36 @@ namespace TypeScriptDefinitionsGenerator.Common
         }
 
         private const string workingPath = "working";
+        
+        public void SetupWorkingFolder()
+        {
+            // Create and empty working folder
+            var workingDir = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath));
+            workingDir.EnumerateFiles().ToList().ForEach(f => f.Delete());
+
+            Directory.CreateDirectory(_options.OutputFilePath);
+            foreach (var assembly in _options.Assemblies)
+            {
+                LoadReferencedAssemblies(assembly);
+            }
+        }
+
+        private static void LoadReferencedAssemblies(string assembly)
+        {
+            var sourceAssemblyDirectory = Path.GetDirectoryName(assembly);
+
+            foreach (var file in Directory.GetFiles(sourceAssemblyDirectory, "*.dll"))
+            {
+                try
+                {
+                    File.Copy(file, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, new FileInfo(file).Name), true);
+                }
+                catch (IOException ex)
+                {
+                    if (!ex.Message.Contains("because it is being used by another process")) throw;
+                }
+            }
+        }
 
         public void GenerateTypeScriptContracts()
         {
@@ -404,6 +434,5 @@ namespace TypeScriptDefinitionsGenerator.Common
   }
 
 ";
-
     }
 }

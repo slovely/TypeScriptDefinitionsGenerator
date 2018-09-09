@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TypeLite;
+using TypeScriptDefinitionsGenerator.Common.SignalR;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 
 namespace TypeScriptDefinitionsGenerator.Core.SignalR
 {
-    public class SignalRGenerator
+    public class SignalRGenerator : BaseSignalRGenerator
     {
-        public const string HUB_TYPE = "Microsoft.AspNetCore.SignalR.Hub";
-        public const string IHUB_TYPE = "Microsoft.AspNetCore.SignalR.Hubs.IHub";
+        private const string HUB_TYPE = "Microsoft.AspNetCore.SignalR.Hub";
+        public override string IHUB_TYPE { get; } = "Microsoft.AspNetCore.SignalR.Hubs.IHub";
 
-        public string GenerateHubs(Assembly assembly, bool generateAsModules)
+        public override string GenerateHubs(Assembly assembly, bool generateAsModules)
         {
             var hubs = assembly.GetTypes()
                 .Where(t => t.BaseType != null && t.BaseType.FullName != null && t.BaseType.FullName.Contains(HUB_TYPE))
