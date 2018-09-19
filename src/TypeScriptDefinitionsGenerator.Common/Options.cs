@@ -17,6 +17,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         public List<string> Namespaces { get; set; }
         [Option("webapiactions", HelpText = "Indicates that methods should be generated for WebAPI actions")]
         public bool GenerateWebApiActions { get; set; }
+        [Option("servicestack", HelpText = "Indicates that methods should be generated for ServiceStack requests")]
+        public bool GenerateServiceStackRequests { get; set; }
         [Option("actionsstyle", HelpText = "Indicates that the style of action methods generated")]
         public ActionsStyle ActionsStyle { get; set; }
         [Option("debugger", HelpText = "Will prompt to attach the debugger")]
@@ -33,5 +35,6 @@ namespace TypeScriptDefinitionsGenerator.Common
     {
         Default,
         Aurelia,
+        Angular,
     }
 }

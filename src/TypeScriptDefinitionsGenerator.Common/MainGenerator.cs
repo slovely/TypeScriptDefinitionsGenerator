@@ -76,32 +76,13 @@ namespace TypeScriptDefinitionsGenerator.Common
                 var assembly = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, fi.Name));
                 Console.WriteLine("Loaded assembly: " + assemblyName);
 
-                // Get the WebAPI controllers...
-                var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate);
+                GenerateContractsForWebApiRequestResponseClasses(assembly, generator);
 
-                // Get the return types...
-                var actions = controllers
-                    .SelectMany(c => c.GetMethods()
-                        .Where(_configuration.ActionsPredicate)
-                        .Where(m => m.DeclaringType == c)
-                    );
-                ProcessMethods(actions, generator);
-
-                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
-                var methods = signalrHubs
-                    .SelectMany(h => h.GetMethods()
-                        .Where(m => m.IsPublic)
-                        .Where(m => m.DeclaringType == h || m.GetBaseDefinition()?.DeclaringType == h));
-                ProcessMethods(methods, generator);
-
-                var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
-                    .Select(t => t.BaseType.GetGenericArguments()[0]);
-                var clientMethods = clientInterfaceTypes
-                    .SelectMany(h => h.GetMethods()
-                        .Where(m => m.IsPublic)
-                        .Where(m => m.DeclaringType == h));
-                ProcessMethods(clientMethods, generator);
-
+                if (_options.GenerateServiceStackRequests)
+                {
+                    GenerateContractsForServiceStackRequestResponseClasses(assembly, generator);
+                }
+                
                 // Add all classes that are declared inside the specified namespace
                 if (_options.Namespaces != null && _options.Namespaces.Any())
                 {
@@ -161,6 +142,56 @@ namespace TypeScriptDefinitionsGenerator.Common
                     RegexOptions.Multiline);
                 File.WriteAllText(Path.Combine(_options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
             }
+        }
+
+        private void GenerateContractsForServiceStackRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
+        {
+            var requests = assembly.GetTypes()
+                .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
+                .ToList();
+
+            // Any requests that specify their return type, also generate them...
+            var responseTypes = new List<Type>();
+            requests.ForEach(req =>
+            {
+                var interfaces = req.GetInterfaces().Where(i => i.FullName == "ServiceStack.IReturn" && i.ContainsGenericParameters).ToList();
+                if (interfaces.Any())
+                {
+                    responseTypes.Add(interfaces.First().GetGenericArguments()[0]);
+                }
+            });
+            
+            ProcessTypes(requests, generator);
+            ProcessTypes(responseTypes, generator);
+        }
+
+        private void GenerateContractsForWebApiRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
+        {
+            // Get the WebAPI controllers...
+            var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate);
+
+            // Get the return types...
+            var actions = controllers
+                .SelectMany(c => c.GetMethods()
+                    .Where(_configuration.ActionsPredicate)
+                    .Where(m => m.DeclaringType == c)
+                );
+            ProcessMethods(actions, generator);
+
+            var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
+            var methods = signalrHubs
+                .SelectMany(h => h.GetMethods()
+                    .Where(m => m.IsPublic)
+                    .Where(m => m.DeclaringType == h || m.GetBaseDefinition()?.DeclaringType == h));
+            ProcessMethods(methods, generator);
+
+            var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
+                .Select(t => t.BaseType.GetGenericArguments()[0]);
+            var clientMethods = clientInterfaceTypes
+                .SelectMany(h => h.GetMethods()
+                    .Where(m => m.IsPublic)
+                    .Where(m => m.DeclaringType == h));
+            ProcessMethods(clientMethods, generator);
         }
 
         private static bool IncludedNamespace(Options options, Type t)

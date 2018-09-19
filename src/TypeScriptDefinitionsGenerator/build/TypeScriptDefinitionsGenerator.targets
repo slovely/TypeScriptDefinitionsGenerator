@@ -70,10 +70,11 @@
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
       <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
       <TsGenCamelCaseNames Condition="'$(TsGenCamelCaseNames)' == 'true'">--camelcase</TsGenCamelCaseNames>
+      <TsGenServiceStackRequests Condition="'$(TsGenServiceStackRequests)' == 'true'">--servicestack</TsGenServiceStackRequests>
       
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
