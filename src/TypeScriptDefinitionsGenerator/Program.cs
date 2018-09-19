@@ -52,20 +52,7 @@ namespace TypeScriptDefinitionsGenerator
                 mainGenerator.SetupWorkingFolder();
                 mainGenerator.GenerateTypeScriptContracts();
                 mainGenerator.GenerateSignalrHubs();
-                if (options.GenerateWebApiActions)
-                {
-                    switch (options.ActionsStyle)
-                    {
-                        case ActionsStyle.Default:
-                            mainGenerator.GenerateWebApiActions();
-                            break;
-                        case ActionsStyle.Aurelia:
-                            mainGenerator.GenerateAureliWebApiActions();
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
+                mainGenerator.GenerateServiceCallProxies();
             }
             else
             {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using TypeLite;
 using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Common.Extensions;
+using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
 
 namespace TypeScriptDefinitionsGenerator.Common
 {
@@ -19,6 +20,7 @@ namespace TypeScriptDefinitionsGenerator.Common
     {
         private readonly Options _options;
         private readonly GenerationConfiguration _configuration;
+        private readonly ServiceStackHelper _ssHelper = new ServiceStackHelper();
 
         public MainGenerator(Options options, GenerationConfiguration configuration)
         {
@@ -56,6 +58,44 @@ namespace TypeScriptDefinitionsGenerator.Common
                     if (!ex.Message.Contains("because it is being used by another process")) throw;
                 }
             }
+        }
+
+        public void GenerateServiceCallProxies()
+        {
+            if (_options.GenerateWebApiActions)
+            {
+                switch (_options.ActionsStyle)
+                {
+                    case ActionsStyle.Default:
+                        GenerateWebApiActions();
+                        break;
+                    case ActionsStyle.Aurelia:
+                        GenerateAureliaWebApiActions();
+                        break;
+                    case ActionsStyle.Angular:
+                        GenerateAngularActions();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            if (_options.GenerateServiceStackRequests)
+            {
+                switch (_options.ActionsStyle)
+                {
+                    case ActionsStyle.Default:
+                        GenerateWebApiActions();
+                        break;
+                    case ActionsStyle.Aurelia:
+                        GenerateAureliaWebApiActions();
+                        break;
+                    case ActionsStyle.Angular:
+                        GenerateAngularActions();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            };
         }
 
         public void GenerateTypeScriptContracts()
@@ -146,23 +186,28 @@ namespace TypeScriptDefinitionsGenerator.Common
 
         private void GenerateContractsForServiceStackRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
         {
-            var requests = assembly.GetTypes()
-                .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
-                .ToList();
+            var requests = GetServiceStackRequestTypes(assembly);
 
             // Any requests that specify their return type, also generate them...
             var responseTypes = new List<Type>();
             requests.ForEach(req =>
             {
-                var interfaces = req.GetInterfaces().Where(i => i.FullName == "ServiceStack.IReturn" && i.ContainsGenericParameters).ToList();
-                if (interfaces.Any())
+                var type = _ssHelper.GetResponseTypeForRequest(req);
+                if (type != null)
                 {
-                    responseTypes.Add(interfaces.First().GetGenericArguments()[0]);
+                    responseTypes.Add(type);
                 }
             });
             
             ProcessTypes(requests, generator);
             ProcessTypes(responseTypes, generator);
+        }
+
+        private static List<Type> GetServiceStackRequestTypes(Assembly assembly)
+        {
+            return assembly.GetTypes()
+                .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
+                .ToList();
         }
 
         private void GenerateContractsForWebApiRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
@@ -274,6 +319,11 @@ namespace TypeScriptDefinitionsGenerator.Common
 
         public void GenerateWebApiActions()
         {
+            if (_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("WebApi actions are not supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
             var output = new StringBuilder("module Api {");
             //TODO: allow this is be configured
             output.Append(_interfaces);
@@ -334,8 +384,13 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
         }
         
-        public void GenerateAureliWebApiActions()
+        public void GenerateAureliaWebApiActions()
         {
+            if (_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("Aurelia actions are not supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
             output.AppendLine("import {HttpClient, json, RequestInit} from \"aurelia-fetch-client\";\r\n");
             var requiredImports = new HashSet<string>();
@@ -458,6 +513,69 @@ namespace TypeScriptDefinitionsGenerator.Common
             // TODO: Support ActionNameAttribute
             return action.Name.ToCamelCase();
         }
+
+        private void GenerateAngularActions()
+        {
+            if (!_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("Angular is only supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
+            var output = new StringBuilder("import {Injectable} from \"@angular/core\";\r\n");
+            output.AppendLine("import {Observable, of} from \"rxjs\";\r\n");
+            output.AppendLine("import {HttpClient, HttpErrorResponse} from \"@angular/common/http\";\r\n");
+            var requiredImports = new HashSet<string>();
+
+            //TODO: allow this is be configured
+            output.Append(_interfaces);
+
+            foreach (var assemblyName in _options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                var requests = GetServiceStackRequestTypes(assembly);
+
+                foreach (var request in requests)
+                {
+                    var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
+                    
+                    if (!routes.Any()) continue;
+                    output.AppendLine("@Injectable()");
+                    output.AppendLine($"  export class {request.Name} {{");
+                    output.AppendLine("    constructor(private http: HttpClient) {");
+                    output.AppendLine("    }");
+
+                    foreach (var route in routes)
+                    {
+                        var verbs = route.GetType().GetProperty("Verbs").GetValue(route) as string;
+                        var path = route.GetType().GetProperty("Path").GetValue(route) as string;
+                        foreach (var verb in verbs.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()))
+                        {
+                            if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
+
+                            var returnType = _ssHelper.GetResponseTypeForRequest(request);
+                            output.AppendLine($"// {verb} - {path} - RETURNS: " + (returnType?.FullName ?? "(unknown)"));
+                        }
+                    }
+                    
+                    output.AppendLine("  }");
+                }
+            }
+
+            if (_options.GenerateAsModules)
+            {
+                var imports = new StringBuilder();
+                imports.AppendLine("import Classes = require(\"./classes\");");
+                foreach (var ns in requiredImports)
+                {
+                    imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);
+                }
+                imports.AppendLine();
+                output.Insert(0, imports.ToString());
+            }
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
+           
+        }
+
 
         private static string _interfaces = @"
   export interface IDictionary<T> {
