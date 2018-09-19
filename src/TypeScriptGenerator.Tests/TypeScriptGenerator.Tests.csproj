@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=02c12cbda47e6587">
+      <HintPath>..\packages\ServiceStack.Interfaces.5.4.0\lib\net45\ServiceStack.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -55,10 +59,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeController.cs" />
+    <Compile Include="ServiceStackTests.cs" />
     <Compile Include="WebApiUrlGenerationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TypeScriptDefinitionsGenerator.Common\TypeScriptDefinitionsGenerator.Common.csproj">
+      <Project>{5b8544b1-b528-404c-b076-78724d31ab4b}</Project>
+      <Name>TypeScriptDefinitionsGenerator.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj">
       <Project>{f1cd6b54-bff3-4fc0-94aa-eaf34eebc876}</Project>
       <Name>TypeScriptDefinitionsGenerator</Name>
@@ -66,6 +75,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
