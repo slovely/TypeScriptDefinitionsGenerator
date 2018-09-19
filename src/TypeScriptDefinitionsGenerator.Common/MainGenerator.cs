@@ -555,7 +555,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                     var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
                     
                     if (!routes.Any()) continue;
-                    output.AppendLine("@Injectable()");
+                    output.AppendLine("  @Injectable({providedIn:\"root\"})");
                     output.AppendLine($"  export class {request.Name} {{");
                     output.AppendLine("    constructor(private http: HttpClient) {");
                     output.AppendLine("    }");
@@ -572,7 +572,7 @@ namespace TypeScriptDefinitionsGenerator.Common
 
                             output.AppendLine($"// {verb} - {path} - RETURNS: " + (returnType?.FullName ?? "(unknown)"));
 
-                            var url = _ssHelper.GenerateUrlFromRoute(path, out var routeParameters);
+                            var url = _ssHelper.GenerateUrlFromRoute(path, request, verb.Equals("get", StringComparison.OrdinalIgnoreCase), out var routeParameters);
                             items.Add(new ServiceStackRouteInfo(verb, path, url, routeParameters));
                         }
 
@@ -582,8 +582,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                     {
                         var item = gets.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}) {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<Classes.{requestTypeScriptName}>({item.Url}).toPromise();");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}).toPromise();");
                         output.AppendLine("    }");
                     }
                     var deletes = items.Where(i => i.Verb == "DELETE").ToList();
@@ -591,8 +591,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                     {
                         var item = deletes.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}) {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<Classes.{requestTypeScriptName}>({item.Url}).toPromise();");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}).toPromise();");
                         output.AppendLine("    }");
                     }
                     var posts = items.Where(i => i.Verb == "POST").ToList();
@@ -615,8 +615,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                                 }
                             }
                         }); 
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}) {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<Classes.{requestTypeScriptName}>({item.Url}, body).toPromise();");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body).toPromise();");
                         output.AppendLine("    }");
                     }
                     var puts = items.Where(i => i.Verb == "PUT").ToList();
@@ -640,7 +640,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                             }
                         }); 
                         output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<Classes.{requestTypeScriptName}>({item.Url}, body).toPromise();");
+                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body).toPromise();");
                         output.AppendLine("    }");
                     }
 
