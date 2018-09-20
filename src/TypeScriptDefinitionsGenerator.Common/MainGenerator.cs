@@ -490,7 +490,7 @@ namespace TypeScriptDefinitionsGenerator.Common
 
         private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
         {
-            var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + a.Type));
+            var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + (a.ClrType?.IsEnum == true ? "Enums." : "") + a.Type));
             if (result != "") result += ", ";
             result += "ajaxOptions: " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
             return result;
@@ -692,6 +692,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             {
                 var imports = new StringBuilder();
                 imports.AppendLine("import * as Classes from \"./classes\";");
+                imports.AppendLine("import * as Enums from \"./enums\";");
                 foreach (var ns in requiredImports)
                 {
                     imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);

@@ -111,7 +111,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                 var fromBody = parameterInfo.GetCustomAttributes<FromBodyAttribute>().FirstOrDefault();
                 // Parameters are from the URL unless specified by a [FromBody] attribute.
                 param.FromUri = fromBody == null;
-
+                param.ClrType = parameterInfo.ParameterType;
                 param.Name = param.Name.ToCamelCase();
                 result.Add(param);
             }
