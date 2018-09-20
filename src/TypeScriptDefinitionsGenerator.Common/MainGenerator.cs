@@ -203,10 +203,13 @@ namespace TypeScriptDefinitionsGenerator.Common
             ProcessTypes(responseTypes, generator);
         }
 
-        private static List<Type> GetServiceStackRequestTypes(Assembly assembly)
+        private List<Type> GetServiceStackRequestTypes(Assembly assembly)
         {
             return assembly.GetTypes()
                 .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
+                // ONLY INCLUDE TYPES WITH AN IRETURN<T> FOR NOW!
+                .Where(type => _ssHelper.GetResponseTypeForRequest(type) != null)
+                .OrderBy(t => t.Name)
                 .ToList();
         }
 
@@ -521,9 +524,12 @@ namespace TypeScriptDefinitionsGenerator.Common
                 throw new Exception("Angular is only supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
             }
 
-            var output = new StringBuilder("import {Injectable} from \"@angular/core\";\r\n");
-            output.AppendLine("import {Observable, of} from \"rxjs\";\r\n");
-            output.AppendLine("import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from \"@angular/common/http\";\r\n");
+            var output = new StringBuilder("import {Injectable} from \"@angular/core\";");
+            output.AppendLine("import {Observable, of} from \"rxjs\";");
+            output.AppendLine("import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from \"@angular/common/http\";");
+            output.AppendLine("import {ServiceService} from \"../app/services/service.service\";");
+            output.AppendLine("import {MessageService} from \"../app/core/messages/message.service\";");
+
             output.AppendLine();
             output.AppendLine(@"type NgHttpOptions = {
   headers?: HttpHeaders | {
@@ -551,13 +557,15 @@ namespace TypeScriptDefinitionsGenerator.Common
                 {
                     var requestTypeScriptName = TypeConverter.GetTypeScriptName(request);
                     var returnType = _ssHelper.GetResponseTypeForRequest(request);
+                    
                     var returnTypeTypeScriptName = returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any";
                     var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
                     
                     if (!routes.Any()) continue;
                     output.AppendLine("  @Injectable({providedIn:\"root\"})");
-                    output.AppendLine($"  export class {request.Name} {{");
-                    output.AppendLine("    constructor(private http: HttpClient) {");
+                    output.AppendLine($"  export class {request.Name} extends ServiceService {{");
+                    output.AppendLine("    constructor(http: HttpClient, msg: MessageService) {");
+                    output.AppendLine("        super(http, msg);");
                     output.AppendLine("    }");
 
                     var items = new List<ServiceStackRouteInfo>();
@@ -583,7 +591,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                         var item = gets.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
                         output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}).toPromise();");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}));");
                         output.AppendLine("    }");
                     }
                     var deletes = items.Where(i => i.Verb == "DELETE").ToList();
@@ -592,7 +600,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                         var item = deletes.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
                         output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}).toPromise();");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}));");
                         output.AppendLine("    }");
                     }
                     var posts = items.Where(i => i.Verb == "POST").ToList();
@@ -611,12 +619,12 @@ namespace TypeScriptDefinitionsGenerator.Common
                             {
                                 foreach (var s in a.Type.GetTopLevelNamespaces())
                                 {
-                                    requiredImports.Add(s);                                
+                                    requiredImports.Add(s);
                                 }
                             }
                         }); 
                         output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body).toPromise();");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body));");
                         output.AppendLine("    }");
                     }
                     var puts = items.Where(i => i.Verb == "PUT").ToList();
@@ -635,55 +643,15 @@ namespace TypeScriptDefinitionsGenerator.Common
                             {
                                 foreach (var s in a.Type.GetTopLevelNamespaces())
                                 {
-                                    requiredImports.Add(s);                                
+                                    requiredImports.Add(s);
                                 }
                             }
                         }); 
                         output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body).toPromise();");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body));");
                         output.AppendLine("    }");
                     }
 
-
-
-                        /*
-                         * var actionParameters = _configuration.GetActionParameters(action);
-                actionParameters.ForEach(a =>
-                {
-                    if (a.Type.Contains("."))
-                    {
-                        foreach (var s in a.Type.GetTopLevelNamespaces())
-                        {
-                            requiredImports.Add(s);                                
-                        }
-                    }
-                });                      
-                var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
-                var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
-                var url = _configuration.UrlGenerator.GetUrl(action);
-                // allow ajax options to be passed in to override defaults
-                output.AppendFormat("    public {0}({1}): PromiseLike<{2}> {{\r\n",
-                    actionName, GetMethodParameters(actionParameters, "RequestInit|undefined", true), returnType);
-                output.AppendFormat("      const options: RequestInit = {{ \r\n        method: \"{0}\", \r\n", httpMethod);
-                output.AppendFormat("        body: {0} ? json({0}) : undefined\r\n", dataParameterName);
-                output.AppendLine("      };");
-                output.AppendLine("      if (ajaxOptions) Object.assign(options, ajaxOptions);");
-                if (returnType == "string")
-                {
-                    output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                        "        .then((response: Response) => (response && response.status!==204) ? response.text() : \"\");\r\n", url);
-                }
-                else
-                {
-                    output.AppendFormat("      return this.http.fetch({0}, options)\r\n" +
-                                        "        .then((response: Response) => (response && response.status!==204) ? response.json() : null);\r\n", url);
-                }
-                output.AppendLine("    }");
-                output.AppendLine();
-                         */
-
-                    
-                    
                     output.AppendLine("  }");
                 }
             }

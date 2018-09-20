@@ -76,6 +76,7 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
                 param.Name = property?.Name ?? parameter;
                 param.Type = property == null ? "any" : TypeConverter.GetTypeScriptName(property.PropertyType);
                 param.FromUri = true;
+                param.ClrType = property?.PropertyType;
 
                 param.Name = (property?.Name ?? parameter).ToCamelCase();
                 result.Add(param);
