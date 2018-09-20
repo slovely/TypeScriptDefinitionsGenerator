@@ -491,11 +491,11 @@ namespace TypeScriptDefinitionsGenerator.Common
         }
 
 
-        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
+        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false, string optionsParameterName = "ajaxOptions")
         {
             var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + (a.ClrType?.IsEnum == true ? "Enums." : "") + a.Type));
             if (result != "") result += ", ";
-            result += "ajaxOptions: " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
+            result += optionsParameterName + ": " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
             return result;
         }
 
@@ -535,12 +535,12 @@ namespace TypeScriptDefinitionsGenerator.Common
   headers?: HttpHeaders | {
       [header: string]: string | string[];
   };
-  observe?: string;
+  observe?: ""body"";
   params?: HttpParams | {
       [param: string]: string | string[];
   };
   reportProgress?: boolean;
-  responseType?: string;
+  responseType?: ""json"";
   withCredentials?: boolean;
 }");
             var requiredImports = new HashSet<string>();
@@ -563,7 +563,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                     
                     if (!routes.Any()) continue;
                     output.AppendLine("  @Injectable({providedIn:\"root\"})");
-                    output.AppendLine($"  export class {request.Name} extends ServiceService {{");
+                    // Replace the 'Request' at the end of the class name, so it doesn't clash with the generated interface in classes.ts - just to make life easier. 
+                    output.AppendLine($"  export class {request.Name.ReplaceLastOccurrence("Request", "")} extends ServiceService {{");
                     output.AppendLine("    constructor(http: HttpClient, msg: MessageService) {");
                     output.AppendLine("        super(http, msg);");
                     output.AppendLine("    }");
@@ -590,8 +591,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                     {
                         var item = gets.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}));");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions", true, "httpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, httpOptions));");
                         output.AppendLine("    }");
                     }
                     var deletes = items.Where(i => i.Verb == "DELETE").ToList();
@@ -599,8 +600,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                     {
                         var item = deletes.MaxBy(i => i.RouteParameters.Count);
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}));");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions", true, "httpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, httpOptions));");
                         output.AppendLine("    }");
                     }
                     var posts = items.Where(i => i.Verb == "POST").ToList();
@@ -623,8 +624,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                                 }
                             }
                         }); 
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body));");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions", true, "httpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body, httpOptions));");
                         output.AppendLine("    }");
                     }
                     var puts = items.Where(i => i.Verb == "PUT").ToList();
@@ -647,8 +648,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                                 }
                             }
                         }); 
-                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
-                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body));");
+                        output.AppendLine($"    {item.Verb.ToLower()}({GetMethodParameters(actionParameters, "NgHttpOptions", true, "httpOptions")}): Promise<{returnTypeTypeScriptName}> {{");
+                        output.AppendLine($"      return super.makePromise(this.http.{item.Verb.ToLower()}<{returnTypeTypeScriptName}>({item.Url}, body, httpOptions));");
                         output.AppendLine("    }");
                     }
 
