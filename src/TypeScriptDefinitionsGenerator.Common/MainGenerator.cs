@@ -136,7 +136,6 @@ namespace TypeScriptDefinitionsGenerator.Common
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
             tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
-            tsEnumDefinitions = "import * as Enums from \"../server/enums\";\r\n\r\n" + tsEnumDefinitions;
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
 
@@ -527,8 +526,8 @@ namespace TypeScriptDefinitionsGenerator.Common
             var output = new StringBuilder("import {Injectable} from \"@angular/core\";");
             output.AppendLine("import {Observable, of} from \"rxjs\";");
             output.AppendLine("import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from \"@angular/common/http\";");
-            output.AppendLine("import {ServiceService} from \"../app/services/service.service\";");
-            output.AppendLine("import {MessageService} from \"../app/core/messages/message.service\";");
+            output.AppendLine("import {ServiceService} from \"./../service.service\";");
+            output.AppendLine("import {MessageService} from \"./../../core/messages/message.service\";");
 
             output.AppendLine();
             output.AppendLine(@"type NgHttpOptions = {
