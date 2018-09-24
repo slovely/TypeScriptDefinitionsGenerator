@@ -32,6 +32,7 @@
         <file src="bin\Release\CommandLine.dll" target="build\net45\CommandLine.dll" />
         <file src="bin\Release\Microsoft.Owin.dll" target="build\net45\Microsoft.Owin.dll" />
         <file src="bin\Release\Microsoft.Owin.Security.dll" target="build\net45\Microsoft.Owin.Security.dll" />
+        <file src="bin\Release\netstandard.dll" target="build\net45\netstandard.dll" />
         <file src="bin\Release\Newtonsoft.Json.dll" target="build\net45\Newtonsoft.Json.dll" />
         <file src="bin\Release\Owin.dll" target="build\net45\Owin.dll" />
         <file src="bin\Release\System.Net.Http.Formatting.dll" target="build\net45\System.Net.Http.Formatting.dll" />
