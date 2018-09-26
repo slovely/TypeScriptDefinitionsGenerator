@@ -136,6 +136,10 @@ namespace TypeScriptDefinitionsGenerator.Common
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
             tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
+            if (_options.UseStringEnums)
+            {
+                tsEnumDefinitions = Regex.Replace(tsEnumDefinitions, "\\b([a-zA-Z]*) = ([\\d]+)", "$1 = \"$1\"");
+            }
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
 
