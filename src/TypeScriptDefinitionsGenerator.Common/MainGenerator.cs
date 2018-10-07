@@ -531,7 +531,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             output.AppendLine("import {Observable, of} from \"rxjs\";");
             output.AppendLine("import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from \"@angular/common/http\";");
             output.AppendLine("import {ServiceService} from \"./../service.service\";");
-            output.AppendLine("import {MessageService} from \"./../../core/messages/message.service\";");
+            output.AppendLine("import {MessageService} from \"./../../core/components/messages/message.service\";");
 
             output.AppendLine();
             output.AppendLine(@"type NgHttpOptions = {
