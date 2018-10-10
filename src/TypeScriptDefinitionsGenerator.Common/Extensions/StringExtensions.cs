@@ -31,9 +31,12 @@ namespace TypeScriptDefinitionsGenerator.Common.Extensions
 
         public static string ReplaceLastOccurrence(this string source, string find, string replace)
         {
-            int Place = source.LastIndexOf(find);
-            string result = source.Remove(Place, find.Length).Insert(Place, replace);
-            return result;
+            var index = source.LastIndexOf(find);
+            if (index > -1)
+            {
+                return source.Remove(index, find.Length).Insert(index, replace);
+            }
+            return source;
         }
     }
 }
