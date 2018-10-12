@@ -9,6 +9,12 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
 {
     internal class ServiceStackHelper
     {
+        public bool ReturnsVoid(Type request)
+        {
+            var interfaces = request.GetInterfaces().Where(i => i.FullName == "ServiceStack.IReturnVoid").ToList();
+            return interfaces.Any();
+        }
+        
         public Type GetResponseTypeForRequest(Type request)
         {
             var interfaces = request.GetInterfaces().Where(i => i.FullName.StartsWith("ServiceStack.IReturn`1") && i.IsGenericType).ToList();

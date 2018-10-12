@@ -210,8 +210,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         {
             return assembly.GetTypes()
                 .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
-                // ONLY INCLUDE TYPES WITH AN IRETURN<T> FOR NOW!
-                .Where(type => _ssHelper.GetResponseTypeForRequest(type) != null)
+                // ONLY INCLUDE TYPES WITH AN IRETURN<T> OR IRETURNVOID FOR NOW!
+                .Where(type => _ssHelper.GetResponseTypeForRequest(type) != null || _ssHelper.ReturnsVoid(type))
                 .OrderBy(t => t.Name)
                 .ToList();
         }
@@ -560,8 +560,9 @@ namespace TypeScriptDefinitionsGenerator.Common
                 {
                     var requestTypeScriptName = TypeConverter.GetTypeScriptName(request);
                     var returnType = _ssHelper.GetResponseTypeForRequest(request);
-                    
-                    var returnTypeTypeScriptName = returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any";
+                    var returnsVoid = _ssHelper.ReturnsVoid(request);
+
+                    var returnTypeTypeScriptName = returnsVoid ? "void" : (returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any");
                     var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
                     
                     if (!routes.Any()) continue;
