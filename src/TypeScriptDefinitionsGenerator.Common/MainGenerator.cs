@@ -103,10 +103,22 @@ namespace TypeScriptDefinitionsGenerator.Common
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
-            if (_options.CamelCase)
+            generator.WithMemberFormatter(i =>
             {
-                generator.WithMemberFormatter(i => Char.ToLower(i.Name[0]) + i.Name.Substring(1));
-            }
+                var identifier = i.Name;
+                if (_options.CamelCase)
+                {
+                    identifier = Char.ToLower(identifier[0]) + identifier.Substring(1);
+                }
+                if (_options.GenerateServiceStackRequests)
+                {
+                    if (!_ssHelper.IsPropertyRequired(i.MemberInfo))
+                    {
+                        identifier += "?";
+                    }
+                }
+                return identifier;
+            });
 
             foreach (var assemblyName in _options.Assemblies)
             {

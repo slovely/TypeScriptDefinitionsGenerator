@@ -90,5 +90,13 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
 
             return result;
         }
+
+        public bool IsPropertyRequired(MemberInfo memberInfo)
+        {
+            var apiMemberAttr = memberInfo.CustomAttributes.FirstOrDefault(x => x.AttributeType.FullName == "ServiceStack.ApiMemberAttribute");
+            if (apiMemberAttr == null) return true;
+            var isRequired = apiMemberAttr.NamedArguments.FirstOrDefault(n => n.MemberName == "IsRequired");
+            return true.Equals(isRequired.TypedValue.Value);
+        }
     }
 }
