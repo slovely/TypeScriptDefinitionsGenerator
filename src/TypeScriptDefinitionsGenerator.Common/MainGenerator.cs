@@ -540,6 +540,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
 
             var output = new StringBuilder("import {Injectable} from \"@angular/core\";");
+            output.AppendLine();
             output.AppendLine("import {Observable, of} from \"rxjs\";");
             output.AppendLine("import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from \"@angular/common/http\";");
             output.AppendLine("import {ServiceService} from \"./../service.service\";");
@@ -559,6 +560,7 @@ namespace TypeScriptDefinitionsGenerator.Common
   withCredentials?: boolean;
 }");
             var requiredImports = new HashSet<string>();
+            var allRequests = new List<string>();
 
             //TODO: allow this is be configured
             output.Append(_interfaces);
@@ -584,6 +586,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                     output.AppendLine("    constructor(http: HttpClient, msg: MessageService) {");
                     output.AppendLine("        super(http, msg);");
                     output.AppendLine("    }");
+                    allRequests.Add(request.Name);
 
                     var items = new List<ServiceStackRouteInfo>();
                     foreach (var route in routes)
@@ -685,6 +688,14 @@ namespace TypeScriptDefinitionsGenerator.Common
                 imports.AppendLine();
                 output.Insert(0, imports.ToString());
             }
+
+            output.AppendLine("");
+            output.AppendLine("export interface AllRequests {");
+            foreach (var request in allRequests)
+            {
+                output.AppendLine($"  {request}: any;");
+            }
+            output.AppendLine("}");
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
            
         }
