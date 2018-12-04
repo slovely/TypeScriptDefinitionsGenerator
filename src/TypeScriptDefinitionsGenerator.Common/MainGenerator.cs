@@ -172,16 +172,16 @@ namespace TypeScriptDefinitionsGenerator.Common
                             if (arg.IsEnum)
                             {
                                 Console.WriteLine("***Replacing " + arg.FullName);
-                                n = n.Replace(arg.FullName, "Enums." + arg.FullName);
+                                n = n.Replace(arg.FullName, "__Enums." + arg.FullName);
                             }
                         }
 
-                        return (asCollection.ItemsType is TsEnum ? "Enums." + n : n) + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
+                        return (asCollection.ItemsType is TsEnum ? "__Enums." + n : n) + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
                     }
-                    return p.PropertyType is TsEnum ? "Enums." + n : n;
+                    return p.PropertyType is TsEnum ? "__Enums." + n : n;
                 });
                 var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
-                tsClassDefinitions = "import * as Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
+                tsClassDefinitions = "import * as __Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
                 tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
                 tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
