@@ -31,33 +31,6 @@ namespace TypeScriptGenerator.Core.Tests
         }
 
         [Fact]
-        public void NestedTemplateTest()
-        {
-            var template = @"export module {{name}} {
-{{#each classes}}
-  {{> class}}
-
-{{/each}}
-}";
-            var classTemplate = @"  public class {{className}} {}";
-            var model = new
-            {
-                name = "MyModule",
-                bob = "bob",
-                classes = new[]
-                {
-                    new {className = "MyClass"}
-                }
-            };
-
-            Handlebars.RegisterTemplate("class", classTemplate);
-
-            var result = Handlebars.Compile(template)(model);
-
-            Assert.Equal("export module MyModule {\r\n  public class MyClass {}\r\n}", result);
-        }
-
-        [Fact]
         public void ServiceStackBlockHelperTest()
         {
             Handlebars.RegisterHelper("MaxRouteParametersForVerb", (TextWriter output, HelperOptions options, dynamic context, object[] arguments) =>
