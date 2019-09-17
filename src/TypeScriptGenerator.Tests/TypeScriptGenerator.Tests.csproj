@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Handlebars, Version=1.10.1.0, Culture=neutral, PublicKeyToken=22225d0bf33cd661">
+      <HintPath>..\packages\Handlebars.Net.1.10.1\lib\net452\Handlebars.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="ServiceStack.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=02c12cbda47e6587">
       <HintPath>..\packages\ServiceStack.Interfaces.5.4.0\lib\net45\ServiceStack.Interfaces.dll</HintPath>
@@ -69,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeController.cs" />
+    <Compile Include="HandlebarsTemplateTests.cs" />
     <Compile Include="ServiceStackTests.cs" />
     <Compile Include="WebApiUrlGenerationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
