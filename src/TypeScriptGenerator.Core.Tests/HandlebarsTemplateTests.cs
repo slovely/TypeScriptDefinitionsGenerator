@@ -58,37 +58,6 @@ namespace TypeScriptGenerator.Core.Tests
         }
 
         [Fact]
-        public void BlockHelpersTest()
-        {
-            Handlebars.RegisterHelper("StringEqualityBlockHelper", (TextWriter output, HelperOptions options, dynamic context, object[] arguments) => {
-                if (arguments.Length != 2)
-                {
-                    throw new HandlebarsException("{{StringEqualityBlockHelper}} helper must have exactly two argument");
-                }
-                string left = arguments[0] as string;
-                string right = arguments[1] as string;
-                if (left == right)
-                {
-                    options.Template(output, null);
-                }
-                else
-                {
-                    options.Inverse(output, null);
-                }
-            });
-            Dictionary<string, string> animals = new Dictionary<string, string>() {
-                {"Fluffy", "cat" },
-                {"Fido", "dog" },
-                {"Chewy", "hamster" }
-            };
-            var template = "{{#each @value}}The animal, {{@key}}, {{StringEqualityBlockHelper @value 'dog'}}is a dog{{else}}is not a dog{{/StringEqualityBlockHelper}}.\r\n{{/each}}";
-            var compiledTemplate = Handlebars.Compile(template);
-            var templateOutput = compiledTemplate(animals);
-            
-            Assert.Equal("The animal, Fluffy, is not a dog.\r\nThe animal, Fido, is a dog.\r\nThe animal, Chewy, is not a dog.\r\n", templateOutput);
-        }
-
-        [Fact]
         public void ServiceStackBlockHelperTest()
         {
             Handlebars.RegisterHelper("MaxRouteParametersForVerb", (TextWriter output, HelperOptions options, dynamic context, object[] arguments) =>
