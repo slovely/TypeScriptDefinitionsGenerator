@@ -73,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeController.cs" />
-    <Compile Include="HandlebarsTemplateTests.cs" />
     <Compile Include="ServiceStackTests.cs" />
     <Compile Include="WebApiUrlGenerationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
