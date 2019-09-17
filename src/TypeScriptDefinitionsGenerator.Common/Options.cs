@@ -13,6 +13,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         public List<string> Assemblies { get; set; }
         [Option('o', "output", Required = true, HelpText = "The folder to which the output will be written.")]
         public string OutputFilePath { get; set; }
+        [Option('t', "templateFolder", Required = false, HelpText = "[OPTIONAL] The folder containing custom Handlebars templates.")]
+        public string TemplateFolder { get; set; }
         [OptionList('n', "namespaces", HelpText = "All classes in this namespace will be converted.", Required = false, Separator = ',')]
         public List<string> Namespaces { get; set; }
         [Option("webapiactions", HelpText = "Indicates that methods should be generated for WebAPI actions")]

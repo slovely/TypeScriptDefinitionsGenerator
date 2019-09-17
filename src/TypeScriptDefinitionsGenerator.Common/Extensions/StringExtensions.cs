@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace TypeScriptDefinitionsGenerator.Common.Extensions
 {
@@ -37,6 +38,11 @@ namespace TypeScriptDefinitionsGenerator.Common.Extensions
                 return source.Remove(index, find.Length).Insert(index, replace);
             }
             return source;
+        }
+
+        public static int GetSecondLastIndexOf(this string source, string value)
+        {
+            return source.Substring(0, source.LastIndexOf(value, StringComparison.Ordinal)).LastIndexOf(value, StringComparison.Ordinal) + 1;
         }
     }
 }

@@ -1,0 +1,8 @@
+import * as Classes from "./classes";
+import * as Enums from "./enums";
+import {Injectable} from "@angular/core";
+import {Observable, of} from "rxjs";
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
+{{#each RequiredImports}}
+import {{.}} = Classes.{{.}};
+{{/each}}

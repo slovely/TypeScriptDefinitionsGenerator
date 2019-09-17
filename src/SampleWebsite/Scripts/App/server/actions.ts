@@ -1,9 +1,8 @@
 module Api {
   export interface IDictionary<T> {
-     [key: string]: T;
+    [key: string]: T;
   }
-
-
+    
   export class Person {
     public static actionMethodWithBodyAndQueryString(body: string, queryId: number, ajaxOptions: IExtendedAjaxSettings = null): JQueryPromise<number> {
       return ServiceCaller.get("api/Person/actionMethodWithBodyAndQueryString" + "?queryId=" + queryId + "", body, ajaxOptions);

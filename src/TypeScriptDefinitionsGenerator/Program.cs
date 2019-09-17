@@ -70,6 +70,7 @@ namespace TypeScriptDefinitionsGenerator
                 var param = new ActionParameterInfo();
                 param.Name = parameterInfo.Name;
                 param.Type = TypeConverter.GetTypeScriptName(parameterInfo.ParameterType);
+                if (parameterInfo.ParameterType.IsEnum) param.Type = "Enums." + param.Type; 
 
                 var fromUri = parameterInfo.GetCustomAttributes<FromUriAttribute>().FirstOrDefault();
                 if (fromUri != null)
@@ -79,7 +80,7 @@ namespace TypeScriptDefinitionsGenerator
                 var fromBody = parameterInfo.GetCustomAttributes<FromBodyAttribute>().FirstOrDefault();
                 // Parameters are from the URL unless specified by a [FromBody] attribute.
                 param.FromUri = fromBody == null;
-
+                param.ClrType = parameterInfo.ParameterType;
                 //TODO: Support route parameters that are not 'id', might be hard as will need to parse routing setup
                 if (parameterInfo.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
                 {

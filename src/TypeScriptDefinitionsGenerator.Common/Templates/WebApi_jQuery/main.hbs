@@ -1,0 +1,9 @@
+module Api {
+  export interface IDictionary<T> {
+    [key: string]: T;
+  }
+    
+    {{#each Controllers}}
+        {{> controller.hbs }}
+    {{/each}}
+}

@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using TypeLite;
-using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Common;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 using TypeScriptDefinitionsGenerator.Core.SignalR;
@@ -45,14 +35,31 @@ namespace TypeScriptDefinitionsGenerator.Core
                 }
 
                 var configuration = new GenerationConfiguration();
-                configuration.ControllerPredicate = t => typeof(ControllerBase).IsAssignableFrom(t);
-                configuration.ActionsPredicate = m => m.IsPublic && !typeof(IActionResult).IsAssignableFrom(m.ReturnType)
-                                                                 && !typeof(Task<IActionResult>).IsAssignableFrom(m.ReturnType)
-                                                                 && !typeof(Task<ActionResult>).IsAssignableFrom(m.ReturnType)
-                                                                 && !typeof(HttpResponseMessage).IsAssignableFrom(m.ReturnType)
-                                                                 && !typeof(Task<HttpResponseMessage>).IsAssignableFrom(m.ReturnType);
+                configuration.ControllerPredicate = t =>
+                {
+                    // Dynamically check types, as might not be using AspNetCore (might be ServiceStack for example).
+                    var controllerBaseType = Type.GetType("Microsoft.AspNetCore.Mvc.Core.ControllerBase, Microsoft.AspNetCore.Mvc.Core");
+                    if (controllerBaseType == null) return false;
+                    return controllerBaseType.IsAssignableFrom(t);
+                };
+                configuration.ActionsPredicate = m =>
+                {
+                    var iActionResultType = Type.GetType("Microsoft.AspNetCore.Mvc.IActionResult, Microsoft.AspNetCore.Mvc.Abstractions");
+                    if (iActionResultType == null) return false;
+                    var genericTaskType = typeof(Task<>);
+                    var iActionResultTypeTask = genericTaskType.MakeGenericType(Type.GetType("Microsoft.AspNetCore.Mvc.IActionResult, Microsoft.AspNetCore.Mvc.Abstractions"));
+                    var actionResultTypeTask = genericTaskType.MakeGenericType(Type.GetType("Microsoft.AspNetCore.Mvc.ActionResult, Microsoft.AspNetCore.Mvc.Core"));
+                    var httpResponseMessageType = Type.GetType("System.Net.Http.HttpResponseMessage, System.Net.Http");
+                    var httpResponseMessageTypeTask = genericTaskType.MakeGenericType(httpResponseMessageType);
+                    
+                    return m.IsPublic && !iActionResultType.IsAssignableFrom(m.ReturnType)
+                                      && !iActionResultTypeTask.IsAssignableFrom(m.ReturnType)
+                                      && !actionResultTypeTask.IsAssignableFrom(m.ReturnType)
+                                      && !httpResponseMessageType.IsAssignableFrom(m.ReturnType)
+                                      && !httpResponseMessageTypeTask.IsAssignableFrom(m.ReturnType);
+                };
                 configuration.SignalRGenerator = new SignalRGenerator();
-                configuration.GetActionParameters = GetActionParameters;
+                configuration.GetActionParameters = WebApiUrlGenerator.GetActionParameters;
                 configuration.UrlGenerator = new WebApiUrlGenerator();
                 var mainGenerator = new MainGenerator(options, configuration);
                 mainGenerator.SetupWorkingFolder();
@@ -81,37 +88,6 @@ namespace TypeScriptDefinitionsGenerator.Core
             }
             Console.WriteLine("TypeScriptGenerator Finished: " + DateTime.Now.ToString("HH:mm:ss"));
 
-        }
-
-        private static List<ActionParameterInfo> GetActionParameters(MethodInfo action)
-        {
-            var result = new List<ActionParameterInfo>();
-            var parameters = action.GetParameters();
-            foreach (var parameterInfo in parameters)
-            {
-                var param = new ActionParameterInfo();
-                param.Name = parameterInfo.Name;
-                param.Type = TypeConverter.GetTypeScriptName(parameterInfo.ParameterType);
-
-                var bind = parameterInfo.GetCustomAttributes<BindAttribute>().FirstOrDefault();
-                if (bind != null)
-                {
-                    param.Name = bind.Prefix ?? param.Name;
-                }
-                var fromBody = parameterInfo.GetCustomAttributes<FromBodyAttribute>().FirstOrDefault();
-                // Parameters are from the URL unless specified by a [FromBody] attribute.
-                param.FromUri = fromBody == null;
-
-                //TODO: Support route parameters that are not 'id', might be hard as will need to parse routing setup
-                if (parameterInfo.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
-                {
-                    param.RouteProperty = true;
-                }
-                param.Name = param.Name.ToCamelCase();
-                result.Add(param);
-            }
-
-            return result;
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace TypeScriptDefinitionsGenerator.Core.Extensions
 {
@@ -43,9 +42,20 @@ namespace TypeScriptDefinitionsGenerator.Core.Extensions
 
         public static bool IsActionResult(this Type type)
         {
-            return typeof(IActionResult).IsAssignableFrom(type)
-                   || typeof(Task<IActionResult>).IsAssignableFrom(type)
-                   || typeof(Task<ActionResult>).IsAssignableFrom(type);
+            var iActionResultType = Type.GetType("Microsoft.AspNetCore.Mvc.IActionResult, Microsoft.AspNetCore.Mvc.Abstractions");
+            if (iActionResultType == null) return false;
+            var genericTaskType = typeof(Task<>);
+            var iActionResultTypeTask = genericTaskType.MakeGenericType(Type.GetType("Microsoft.AspNetCore.Mvc.IActionResult, Microsoft.AspNetCore.Mvc.Abstractions"));
+            var actionResultTypeTask = genericTaskType.MakeGenericType(Type.GetType("Microsoft.AspNetCore.Mvc.ActionResult, Microsoft.AspNetCore.Mvc.Core"));
+
+            return iActionResultType.IsAssignableFrom(type)
+                   || iActionResultTypeTask.IsAssignableFrom(type)
+                   || actionResultTypeTask.IsAssignableFrom(type);
+        }
+
+        public static object GetPropertyValue(this object instance, string propertyName)
+        {
+            return instance.GetType().GetProperty(propertyName).GetValue(instance);
         }
     }
 }

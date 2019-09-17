@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,9 +7,12 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\ServiceCaller.ts" />
+        <EmbeddedResource Include="Templates\ServiceStack_Angular\*.hbs" />
+        <EmbeddedResource Include="Templates\WebApi_jQuery\*.hbs" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="1.9.71" />
+      <PackageReference Include="Handlebars.Net" Version="1.10.1" />
       <PackageReference Include="TypeLite" Version="1.8.1" />
     </ItemGroup>
 

@@ -2,12 +2,14 @@
 
 namespace TypeScriptDefinitionsGenerator.Common
 {
-    internal class ServiceStackRouteInfo
+    public class ServiceStackRouteInfo
     {
         public string Verb { get; }
         public string Path { get; }
         public string Url { get; }
         public List<string> RouteParameters { get; }
+        public List<ActionParameterInfo> ActionParameters { get; set; }
+        public string ReturnTypeTypeScriptName { get; set; }
 
         public ServiceStackRouteInfo(string verb, string path, string url, List<string> routeParameters)
         {
