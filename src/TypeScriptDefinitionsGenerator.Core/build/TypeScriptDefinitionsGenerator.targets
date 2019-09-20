@@ -33,7 +33,7 @@
       <TsGenServiceStackRequests Condition="'$(TsGenServiceStackRequests)' == 'true'">--servicestack</TsGenServiceStackRequests>
       <TsGenStringEnums Condition="'$(TsGenStringEnums)' == 'true'">--stringenums</TsGenStringEnums>
       <TsGenTemplateFolder Condition="'$(TsGenTemplateFolder)' != ''">--templateFolder $(TsGenTemplateFolder)</TsGenTemplateFolder>
-      <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilenameFolder)</TsGenActionsFilename>
+      <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilename)</TsGenActionsFilename>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
