@@ -399,7 +399,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             SetupHelpers();
             SetupTemplates("WebApi_jQuery");
             var result = Handlebars.Compile("{{> main.hbs }}")(model);
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), result);
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), result);
 
             if (!_options.SuppressDefaultServiceCaller)
             {
@@ -512,7 +512,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                 imports.AppendLine();
                 output.Insert(0, imports.ToString());
             }
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), output.ToString());
         }
 
 
@@ -688,7 +688,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             SetupTemplates("ServiceStack_Angular");
             var actions = Handlebars.Compile("{{> main.hbs }}")(model);
 
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), actions);
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), actions);
         }
 
         public static void SetupHelpers()

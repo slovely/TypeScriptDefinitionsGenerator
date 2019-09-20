@@ -33,6 +33,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         public bool UseStringEnums { get; set; }
         [Option("camelcase", HelpText = "Generates property names using camel case", DefaultValue = false)]
         public bool CamelCase { get; set; }
+        [Option("actionsOutputFileName", HelpText = "Set the output filename for the actions file.  Default: actions.ts", DefaultValue = "actions.ts")]
+        public string ActionsOutputFileName { get; set; }
     }
 
     public enum ActionsStyle

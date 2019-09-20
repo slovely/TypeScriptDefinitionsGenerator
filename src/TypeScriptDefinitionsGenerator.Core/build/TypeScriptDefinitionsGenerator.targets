@@ -33,10 +33,11 @@
       <TsGenServiceStackRequests Condition="'$(TsGenServiceStackRequests)' == 'true'">--servicestack</TsGenServiceStackRequests>
       <TsGenStringEnums Condition="'$(TsGenStringEnums)' == 'true'">--stringenums</TsGenStringEnums>
       <TsGenTemplateFolder Condition="'$(TsGenTemplateFolder)' != ''">--templateFolder $(TsGenTemplateFolder)</TsGenTemplateFolder>
+      <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilenameFolder)</TsGenActionsFilename>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder)</ExecCmd>
+      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
