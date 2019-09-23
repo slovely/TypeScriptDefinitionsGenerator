@@ -48,9 +48,9 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
             }
             var queryString = includeQueryStringParams ? GetQueryStringParameters(requestDto, routeParameters) : null;
             if (string.IsNullOrEmpty(queryString))
-                return "\"api" + result + "\"";
+                return "\"" + result.TrimStart('/') + "\"";
 
-            return "\"api" + result + queryString + "\"";
+            return "\"" + result.TrimStart('/') + queryString + "\"";
         }
 
         private string GetQueryStringParameters(Type requestDto, List<string> routeParameters)
