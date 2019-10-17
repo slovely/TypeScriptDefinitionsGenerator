@@ -746,7 +746,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             });
             Handlebars.RegisterHelper("IfEqualsAny", (writer, options, context, parameters) =>
             {
-                if (parameters.Length <= 2) throw new HandlebarsException("{{IfEqualsAny}} helper expects at least two parameters: input string, and N number of matching strings");
+                if (parameters.Length < 2) throw new HandlebarsException("{{IfEqualsAny}} helper expects at least two parameters: input string, and N number of matching strings");
                 var item = parameters[0].ToString();
                 var otherParameters = parameters.Skip(1).ToArray();
                 if (otherParameters.Any(x => x.Equals(item)))
@@ -756,10 +756,28 @@ namespace TypeScriptDefinitionsGenerator.Common
             });
             Handlebars.RegisterHelper("IfEqualsAll", (writer, options, context, parameters) =>
             {
-                if (parameters.Length <= 2) throw new HandlebarsException("{{IfEqualsAll}} helper expects at least two parameters: input string, and N number of matching strings");
+                if (parameters.Length < 2) throw new HandlebarsException("{{IfEqualsAll}} helper expects at least two parameters: input string, and N number of matching strings");
                 var item = parameters[0].ToString();
                 var otherParameters = parameters.Skip(1).ToArray();
                 if (otherParameters.All(x => x.Equals(item)))
+                    options.Template(writer, null);
+                else
+                    options.Inverse(writer, null);
+            });
+            Handlebars.RegisterHelper("IfEqual", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfEquals}} helper expects at two parameters");
+                var item = parameters[0].ToString();
+                if (parameters[1].ToString().Equals(item))
+                    options.Template(writer, null);
+                else
+                    options.Inverse(writer, null);
+            });
+            Handlebars.RegisterHelper("IfNotEqual", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfNotEquals}} helper expects at two parameters");
+                var item = parameters[0].ToString();
+                if (!parameters[1].ToString().Equals(item))
                     options.Template(writer, null);
                 else
                     options.Inverse(writer, null);
