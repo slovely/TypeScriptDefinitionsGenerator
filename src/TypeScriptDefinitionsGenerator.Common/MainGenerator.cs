@@ -750,9 +750,9 @@ namespace TypeScriptDefinitionsGenerator.Common
                 var item = parameters[0].ToString();
                 var otherParameters = parameters.Skip(1).ToArray();
                 if (otherParameters.Any(x => x.Equals(item)))
-                    options.Template(writer, null);
+                    options.Template(writer, context);
                 else
-                    options.Inverse(writer, null);
+                    options.Inverse(writer, context);
             });
             Handlebars.RegisterHelper("IfEqualsAll", (writer, options, context, parameters) =>
             {
@@ -760,27 +760,27 @@ namespace TypeScriptDefinitionsGenerator.Common
                 var item = parameters[0].ToString();
                 var otherParameters = parameters.Skip(1).ToArray();
                 if (otherParameters.All(x => x.Equals(item)))
-                    options.Template(writer, null);
+                    options.Template(writer, context);
                 else
-                    options.Inverse(writer, null);
+                    options.Inverse(writer, context);
             });
             Handlebars.RegisterHelper("IfEqual", (writer, options, context, parameters) =>
             {
                 if (parameters.Length != 2) throw new HandlebarsException("{{IfEquals}} helper expects at two parameters");
                 var item = parameters[0].ToString();
                 if (parameters[1].ToString().Equals(item))
-                    options.Template(writer, null);
+                    options.Template(writer, context);
                 else
-                    options.Inverse(writer, null);
+                    options.Inverse(writer, context);
             });
             Handlebars.RegisterHelper("IfNotEqual", (writer, options, context, parameters) =>
             {
                 if (parameters.Length != 2) throw new HandlebarsException("{{IfNotEquals}} helper expects at two parameters");
                 var item = parameters[0].ToString();
                 if (!parameters[1].ToString().Equals(item))
-                    options.Template(writer, null);
+                    options.Template(writer, context);
                 else
-                    options.Inverse(writer, null);
+                    options.Inverse(writer, context);
             });
 
         }
