@@ -2,7 +2,8 @@
   "profiles": {
     "TypeScriptDefinitionsGenerator.Core": {
       "commandName": "Project",
-      "commandLineArgs": "--"
+      "commandLineArgs": "-a \"..\\Allocator.Core\\bin\\$(Configuration)\\netcoreapp3.0\\Allocator.Core.dll\" --o \"ClientApp\\app\\server\" --webapiactions --actionsstyle Aurelia --suppressdefaultservicecaller --generateasmodules --debugger --netcore30",
+      "workingDirectory": "E:\\Git\\tasks\\Allocator\\Allocator"
     }
   }
 }
