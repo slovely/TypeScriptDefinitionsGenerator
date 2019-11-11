@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
 EndProject
@@ -21,9 +21,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptGenerator.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.Core", "TypeScriptDefinitionsGenerator.Core\TypeScriptDefinitionsGenerator.Core.csproj", "{29C2F3BA-8126-47C5-B4A1-8FA92CC59049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator.BuildSupport", "TypeScriptDefinitionsGenerator.BuildSupport\TypeScriptDefinitionsGenerator.BuildSupport.csproj", "{2583FAAE-B9DA-44D1-B97B-660AA000C0C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.BuildSupport", "TypeScriptDefinitionsGenerator.BuildSupport\TypeScriptDefinitionsGenerator.BuildSupport.csproj", "{2583FAAE-B9DA-44D1-B97B-660AA000C0C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator.Common", "TypeScriptDefinitionsGenerator.Common\TypeScriptDefinitionsGenerator.Common.csproj", "{5B8544B1-B528-404C-B076-78724D31AB4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.Common", "TypeScriptDefinitionsGenerator.Common\TypeScriptDefinitionsGenerator.Common.csproj", "{5B8544B1-B528-404C-B076-78724D31AB4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

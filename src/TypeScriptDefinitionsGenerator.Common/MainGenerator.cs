@@ -114,7 +114,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
-            tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
+            tsEnumDefinitions = tsEnumDefinitions.Replace("namespace ", "export module ");
             tsEnumDefinitions = "import * as Enums from \"../server/enums\";\r\n\r\n" + tsEnumDefinitions;
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
@@ -146,7 +146,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                 });
                 var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
                 tsClassDefinitions = "import * as Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
-                tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
+                tsClassDefinitions = tsClassDefinitions.Replace("declare namespace", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
                 tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
                     m => ": {[key: string]: " + m.Groups["v"].Value + "};",
