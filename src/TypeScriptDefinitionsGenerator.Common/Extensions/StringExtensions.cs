@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace TypeScriptDefinitionsGenerator.Common.Extensions
 {
@@ -9,6 +10,11 @@ namespace TypeScriptDefinitionsGenerator.Common.Extensions
             return value.Substring(0, 1).ToLower() + value.Substring(1);
         }
 
+        public static string ToPascalCase(this string value)
+        {
+            return value.Substring(0, 1).ToUpper() + value.Substring(1);
+        }
+        
         public static string[] GetTopLevelNamespaces(this string typeScriptType)
         {
             var startIndex = typeScriptType.IndexOf("<") + 1;
@@ -24,5 +30,19 @@ namespace TypeScriptDefinitionsGenerator.Common.Extensions
                 .ToArray();
         }
 
+        public static string ReplaceLastOccurrence(this string source, string find, string replace)
+        {
+            var index = source.LastIndexOf(find);
+            if (index > -1)
+            {
+                return source.Remove(index, find.Length).Insert(index, replace);
+            }
+            return source;
+        }
+
+        public static int GetSecondLastIndexOf(this string source, string value)
+        {
+            return source.Substring(0, source.LastIndexOf(value, StringComparison.Ordinal)).LastIndexOf(value, StringComparison.Ordinal) + 1;
+        }
     }
 }

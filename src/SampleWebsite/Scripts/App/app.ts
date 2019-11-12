@@ -1,4 +1,10 @@
-﻿$(() => {
+﻿///<reference path="server/actions.ts"/>
+///<reference path="server/classes.d.ts"/>
+///<reference path="server/enums.ts"/>
+///<reference path="server/hubs.d.ts"/>
+///<reference path="PersonHub.ts"/>
+
+$(() => {
 
     // Simulate getting a person
     Api.Person.getPerson()

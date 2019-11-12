@@ -1,3 +1,5 @@
+using System;
+
 namespace TypeScriptDefinitionsGenerator.Common
 {
     public class ActionParameterInfo
@@ -7,5 +9,6 @@ namespace TypeScriptDefinitionsGenerator.Common
         public bool RouteProperty { get; set; }
         public string Type { get; set; }
         public string OriginalName { get; set; }
+        public Type ClrType { get; set; }
     }
 }

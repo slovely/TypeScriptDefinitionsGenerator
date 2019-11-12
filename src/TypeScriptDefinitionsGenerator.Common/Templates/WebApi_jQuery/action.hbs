@@ -1,0 +1,4 @@
+    public static {{TypeScriptName}}({{#each ActionParameters}}{{Name}}: {{Type}}, {{/each}}ajaxOptions: IExtendedAjaxSettings = null): JQueryPromise<{{ReturnType}}> {
+      return ServiceCaller.{{Verbs.0}}({{{Url}}}, {{DataParameterName}}, ajaxOptions);
+    }
+

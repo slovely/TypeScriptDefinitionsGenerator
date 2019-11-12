@@ -12,7 +12,7 @@
   <UsingTask TaskName="TypeScriptDefinitionsGenerator.BuildSupport.CreateMulitpleParameterString" AssemblyFile="$(TaskAssembly)" />
 
   <Target Name="AfterResolveReferences">
-    
+
     <Error Condition="!Exists('$(ProjectDir)TsGenerator.props')" Text="You must add a TsGenerator.props file to the root of your project.  Please see https://github.com/slovely/TypeScriptDefinitionsGenerator/blob/master/src/TypeScriptDefinitionsGenerator/build/TsGenerator.props for an example." />
 
     <CreateMulitpleParameterString Values="@(TsNamespaces)" ArgumentName="-n">
@@ -22,7 +22,7 @@
     <CreateMulitpleParameterString Values="@(TsGenInputAssembly)" ArgumentName="-a">
       <Output TaskParameter="Parameter" PropertyName="InputAssembliesParam"></Output>
     </CreateMulitpleParameterString>
-    
+
     <PropertyGroup>
       <DebugParam Condition="'$(TsGenDebug)' == 'true'">--debugger</DebugParam>
       <WebApiParam Condition="'$(TsGenWebApiMethods)' == 'true'">--webapiactions</WebApiParam>
@@ -30,10 +30,14 @@
       <TsGenApiMethodStyle Condition="'$(TsGenApiMethodStyle)' == ''">Default</TsGenApiMethodStyle>
       <TsGenAsModules Condition="'$(TsGenAsModules)' == 'true'">--generateasmodules</TsGenAsModules>
       <TsGenCamelCaseNames Condition="'$(TsGenCamelCaseNames)' == 'true'">--camelcase</TsGenCamelCaseNames>
+      <TsGenServiceStackRequests Condition="'$(TsGenServiceStackRequests)' == 'true'">--servicestack</TsGenServiceStackRequests>
+      <TsGenStringEnums Condition="'$(TsGenStringEnums)' == 'true'">--stringenums</TsGenStringEnums>
+      <TsGenTemplateFolder Condition="'$(TsGenTemplateFolder)' != ''">--templateFolder $(TsGenTemplateFolder)</TsGenTemplateFolder>
+      <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilename)</TsGenActionsFilename>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames)</ExecCmd>
+      <ExecCmd>dotnet &quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.Core.dll&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
@@ -41,7 +45,7 @@
     <Message Condition="'$(TsGenDisabled)' == 'true'" Importance="High" Text="GENERATION DISABLED!"></Message>
 
     <Exec Condition="'$(TsGenDisabled)' != 'true'" Command="$(ExecCmd)" WorkingDirectory="$(ProjectDir)" />
-    
+
   </Target>
 
 </Project>

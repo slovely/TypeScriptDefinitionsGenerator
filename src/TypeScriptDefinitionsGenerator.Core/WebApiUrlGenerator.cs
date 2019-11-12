@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc;
 using TypeScriptDefinitionsGenerator.Common;
 using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
@@ -19,7 +19,7 @@ namespace TypeScriptDefinitionsGenerator.Core
             var routeAttr = method.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == "System.Web.Http.RouteAttribute");
             if (routeAttr != null)
             {
-                url = GenerateUrlFromRoute((RouteAttribute) routeAttr, out routeParameters, actionParameters);
+                url = GenerateUrlFromRoute(routeAttr, out routeParameters, actionParameters);
             }
             else
             {
@@ -46,11 +46,11 @@ namespace TypeScriptDefinitionsGenerator.Core
             return $"\"api/{controllerName}/{actionName}" + (hasIdParameter ? "/\" + id" : "\"");
         }
 
-        private static string GenerateUrlFromRoute(RouteAttribute routeAttr, out List<string> routeParameters, List<ActionParameterInfo> actionParameters)
+        private static string GenerateUrlFromRoute(object routeAttr, out List<string> routeParameters, List<ActionParameterInfo> actionParameters)
         {
             var routeParametersList = new List<string>();
             routeParameters = routeParametersList;
-            var result = routeAttr.Template;
+            var result = routeAttr.GetPropertyValue("Template") as string;
             var matches = Regex.Matches(result, "[{].+?[}]");
             if (matches.Count == 0)
                 return "\"" + result + "\"";
@@ -81,7 +81,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                 .FirstOrDefault(a => a.GetType().FullName == "System.Web.Http.ActionNameAttribute");
             if (actionNameAttribute != null)
             {
-                return ((ActionNameAttribute) actionNameAttribute).Name.ToCamelCase();
+                return actionNameAttribute.GetPropertyValue("Name").ToString().ToCamelCase();
             }
             return method.Name.ToCamelCase();
         }
@@ -92,31 +92,42 @@ namespace TypeScriptDefinitionsGenerator.Core
             if (result != "") result = "?" + result;
             return result;
         }
-        
-        private static List<ActionParameterInfo> GetActionParameters(MethodInfo action)
+
+        public static List<ActionParameterInfo> GetActionParameters(MethodInfo action)
         {
             var result = new List<ActionParameterInfo>();
             var parameters = action.GetParameters();
             foreach (var parameterInfo in parameters)
             {
                 var param = new ActionParameterInfo();
-                param.Name = param.OriginalName = parameterInfo.Name;
+                param.Name = parameterInfo.Name;
                 param.Type = TypeConverter.GetTypeScriptName(parameterInfo.ParameterType);
+                if (parameterInfo.ParameterType.IsEnum) param.Type = "Enums." + param.Type;
 
-                var bindAttribute = parameterInfo.GetCustomAttributes<BindAttribute>().FirstOrDefault();
-                if (bindAttribute != null)
+                var bind = parameterInfo.GetCustomAttributes(false)
+                    .FirstOrDefault(a => a.GetType().FullName == "Microsoft.AspNetCore.Mvc.BindAttribute");
+
+                if (bind != null)
                 {
-                    param.Name = bindAttribute.Prefix ?? param.Name;
+                    param.Name = (bind.GetPropertyValue("Prefix") as string) ?? param.Name;
                 }
-                var fromBody = parameterInfo.GetCustomAttributes<FromBodyAttribute>().FirstOrDefault();
+                var fromBody = parameterInfo.GetCustomAttributes(false)
+                    .FirstOrDefault(a => a.GetType().FullName == "Microsoft.AspNetCore.Mvc.FromBodyAttribute");
                 // Parameters are from the URL unless specified by a [FromBody] attribute.
                 param.FromUri = fromBody == null;
 
+                //TODO: Support route parameters that are not 'id', might be hard as will need to parse routing setup
+                if (parameterInfo.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
+                {
+                    param.RouteProperty = true;
+                }
                 param.Name = param.Name.ToCamelCase();
+                param.ClrType = parameterInfo.ParameterType;
                 result.Add(param);
             }
 
             return result;
         }
+
     }
 }

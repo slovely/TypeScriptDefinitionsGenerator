@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using HandlebarsDotNet;
 using TypeLite;
 using TypeLite.TsModels;
 using TypeScriptDefinitionsGenerator.Common.Extensions;
+using TypeScriptDefinitionsGenerator.Common.Models;
+using TypeScriptDefinitionsGenerator.Common.UrlGenerators;
+using Action = TypeScriptDefinitionsGenerator.Common.Models.Action;
 
 namespace TypeScriptDefinitionsGenerator.Common
 {
@@ -19,6 +23,7 @@ namespace TypeScriptDefinitionsGenerator.Common
     {
         private readonly Options _options;
         private readonly GenerationConfiguration _configuration;
+        private readonly ServiceStackHelper _ssHelper = new ServiceStackHelper();
 
         public MainGenerator(Options options, GenerationConfiguration configuration)
         {
@@ -45,6 +50,7 @@ namespace TypeScriptDefinitionsGenerator.Common
         {
             var sourceAssemblyDirectory = Path.GetDirectoryName(assembly);
 
+            Console.WriteLine("Copying files from: " + sourceAssemblyDirectory + " to " + workingPath);
             foreach (var file in Directory.GetFiles(sourceAssemblyDirectory, "*.dll"))
             {
                 try
@@ -58,15 +64,65 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
         }
 
+        public void GenerateServiceCallProxies()
+        {
+            if (_options.GenerateWebApiActions)
+            {
+                switch (_options.ActionsStyle)
+                {
+                    case ActionsStyle.Default:
+                        GenerateWebApiActions();
+                        break;
+                    case ActionsStyle.Aurelia:
+                        GenerateAureliaWebApiActions();
+                        break;
+                    case ActionsStyle.Angular:
+                        GenerateAngularActions();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            if (_options.GenerateServiceStackRequests)
+            {
+                switch (_options.ActionsStyle)
+                {
+                    case ActionsStyle.Default:
+                        GenerateWebApiActions();
+                        break;
+                    case ActionsStyle.Aurelia:
+                        GenerateAureliaWebApiActions();
+                        break;
+                    case ActionsStyle.Angular:
+                        GenerateAngularActions();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            };
+        }
+
         public void GenerateTypeScriptContracts()
         {
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
-            if (_options.CamelCase)
+            generator.WithMemberFormatter(i =>
             {
-                generator.WithMemberFormatter(i => Char.ToLower(i.Name[0]) + i.Name.Substring(1));
-            }
+                var identifier = i.Name;
+                if (_options.CamelCase)
+                {
+                    identifier = Char.ToLower(identifier[0]) + identifier.Substring(1);
+                }
+                if (_options.GenerateServiceStackRequests)
+                {
+                    if (!_ssHelper.IsPropertyRequired(i.MemberInfo))
+                    {
+                        identifier += "?";
+                    }
+                }
+                return identifier;
+            });
 
             foreach (var assemblyName in _options.Assemblies)
             {
@@ -76,32 +132,13 @@ namespace TypeScriptDefinitionsGenerator.Common
                 var assembly = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, workingPath, fi.Name));
                 Console.WriteLine("Loaded assembly: " + assemblyName);
 
-                // Get the WebAPI controllers...
-                var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate);
+                GenerateContractsForWebApiRequestResponseClasses(assembly, generator);
 
-                // Get the return types...
-                var actions = controllers
-                    .SelectMany(c => c.GetMethods()
-                        .Where(_configuration.ActionsPredicate)
-                        .Where(m => m.DeclaringType == c)
-                    );
-                ProcessMethods(actions, generator);
-
-                var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
-                var methods = signalrHubs
-                    .SelectMany(h => h.GetMethods()
-                        .Where(m => m.IsPublic)
-                        .Where(m => m.DeclaringType == h || m.GetBaseDefinition()?.DeclaringType == h));
-                ProcessMethods(methods, generator);
-
-                var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
-                    .Select(t => t.BaseType.GetGenericArguments()[0]);
-                var clientMethods = clientInterfaceTypes
-                    .SelectMany(h => h.GetMethods()
-                        .Where(m => m.IsPublic)
-                        .Where(m => m.DeclaringType == h));
-                ProcessMethods(clientMethods, generator);
-
+                if (_options.GenerateServiceStackRequests)
+                {
+                    GenerateContractsForServiceStackRequestResponseClasses(assembly, generator);
+                }
+                
                 // Add all classes that are declared inside the specified namespace
                 if (_options.Namespaces != null && _options.Namespaces.Any())
                 {
@@ -114,8 +151,14 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
 
             var tsEnumDefinitions = generator.Generate(TsGeneratorOutput.Enums);
-            tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
-            tsEnumDefinitions = "import * as Enums from \"../server/enums\";\r\n\r\n" + tsEnumDefinitions;
+            if (_options.GenerateAsModules)
+            {
+                tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
+            }
+            if (_options.UseStringEnums)
+            {
+                tsEnumDefinitions = Regex.Replace(tsEnumDefinitions, "\\b([a-zA-Z]*) = ([\\d]+)", "$1 = \"$1\"");
+            }
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
 
@@ -136,16 +179,16 @@ namespace TypeScriptDefinitionsGenerator.Common
                             if (arg.IsEnum)
                             {
                                 Console.WriteLine("***Replacing " + arg.FullName);
-                                n = n.Replace(arg.FullName, "Enums." + arg.FullName);
+                                n = n.Replace(arg.FullName, "__Enums." + arg.FullName);
                             }
                         }
 
-                        return (asCollection.ItemsType is TsEnum ? "Enums." + n : n) + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
+                        return (asCollection.ItemsType is TsEnum ? "__Enums." + n : n) + string.Concat(Enumerable.Repeat("[]", asCollection.Dimension));
                     }
-                    return p.PropertyType is TsEnum ? "Enums." + n : n;
+                    return p.PropertyType is TsEnum ? "__Enums." + n : n;
                 });
                 var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
-                tsClassDefinitions = "import * as Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
+                tsClassDefinitions = "import * as __Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
                 tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
                 tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
@@ -161,6 +204,64 @@ namespace TypeScriptDefinitionsGenerator.Common
                     RegexOptions.Multiline);
                 File.WriteAllText(Path.Combine(_options.OutputFilePath, "classes.d.ts"), tsClassDefinitions);
             }
+        }
+
+        private void GenerateContractsForServiceStackRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
+        {
+            var requests = GetServiceStackRequestTypes(assembly);
+
+            // Any requests that specify their return type, also generate them...
+            var responseTypes = new List<Type>();
+            requests.ForEach(req =>
+            {
+                var type = _ssHelper.GetResponseTypeForRequest(req);
+                if (type != null)
+                {
+                    responseTypes.Add(type);
+                }
+            });
+            
+            ProcessTypes(requests, generator);
+            ProcessTypes(responseTypes, generator);
+        }
+
+        private List<Type> GetServiceStackRequestTypes(Assembly assembly)
+        {
+            return assembly.GetTypes()
+                .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
+                // ONLY INCLUDE TYPES WITH AN IRETURN<T> OR IRETURNVOID FOR NOW!
+                .Where(type => _ssHelper.GetResponseTypeForRequest(type) != null || _ssHelper.ReturnsVoid(type))
+                .OrderBy(t => t.Name)
+                .ToList();
+        }
+
+        private void GenerateContractsForWebApiRequestResponseClasses(Assembly assembly, TypeScriptFluent generator)
+        {
+            // Get the WebAPI controllers...
+            var controllers = assembly.GetTypes().Where(_configuration.ControllerPredicate);
+
+            // Get the return types...
+            var actions = controllers
+                .SelectMany(c => c.GetMethods()
+                    .Where(_configuration.ActionsPredicate)
+                    .Where(m => m.DeclaringType == c)
+                );
+            ProcessMethods(actions, generator);
+
+            var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
+            var methods = signalrHubs
+                .SelectMany(h => h.GetMethods()
+                    .Where(m => m.IsPublic)
+                    .Where(m => m.DeclaringType == h || m.GetBaseDefinition()?.DeclaringType == h));
+            ProcessMethods(methods, generator);
+
+            var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)
+                .Select(t => t.BaseType.GetGenericArguments()[0]);
+            var clientMethods = clientInterfaceTypes
+                .SelectMany(h => h.GetMethods()
+                    .Where(m => m.IsPublic)
+                    .Where(m => m.DeclaringType == h));
+            ProcessMethods(clientMethods, generator);
         }
 
         private static bool IncludedNamespace(Options options, Type t)
@@ -243,9 +344,12 @@ namespace TypeScriptDefinitionsGenerator.Common
 
         public void GenerateWebApiActions()
         {
-            var output = new StringBuilder("module Api {");
-            //TODO: allow this is be configured
-            output.Append(_interfaces);
+            if (_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("WebApi actions are not supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
+            var model = new WebApiModel();
 
             foreach (var assemblyName in _options.Assemblies)
             {
@@ -261,8 +365,12 @@ namespace TypeScriptDefinitionsGenerator.Common
                     if (!actions.Any()) continue;
 
                     var controllerName = controller.Name.Replace("Controller", "");
-                    output.AppendFormat("\r\n  export class {0} {{\r\n", controllerName);
 
+                    var controllerModel = new Controller();
+                    controllerModel.ServerType = controller;
+                    controllerModel.TypeScriptName = controllerName;
+                    model.Controllers.Add(controllerModel);
+                    
                     // TODO: WebAPI supports multiple actions with the same name but different parameters - this doesn't!
                     foreach (var action in actions)
                     {
@@ -275,22 +383,23 @@ namespace TypeScriptDefinitionsGenerator.Common
                         var dataParameter = actionParameters.FirstOrDefault(a => !a.FromUri && !a.RouteProperty);
                         var dataParameterName = dataParameter == null ? "null" : dataParameter.Name;
                         var url = _configuration.UrlGenerator.GetUrl(action);
-                        // allow ajax options to be passed in to override defaults
-                        output.AppendFormat("    public static {0}({1}): JQueryPromise<{2}> {{\r\n",
-                            action.Name.ToCamelCase(), GetMethodParameters(actionParameters, "IExtendedAjaxSettings"), returnType);
-                        output.AppendFormat("      return ServiceCaller.{0}({1}, {2}, ajaxOptions);\r\n",
-                            httpMethod, url, dataParameterName);
-                        output.AppendLine("    }");
-                        output.AppendLine();
+                        
+                        var actionModel = new Action();
+                        actionModel.Verbs = new[] {httpMethod};
+                        actionModel.Url = url;
+                        actionModel.TypeScriptName = action.Name.ToCamelCase();
+                        actionModel.ActionParameters = actionParameters;
+                        actionModel.DataParameterName = dataParameterName;
+                        actionModel.ReturnType = returnType;
+                        controllerModel.Actions.Add(actionModel);
                     }
-
-                    output.AppendLine("  }");
                 }
             }
 
-            output.Append("}");
-
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
+            SetupHelpers();
+            SetupTemplates("WebApi_jQuery");
+            var result = Handlebars.Compile("{{> main.hbs }}")(model);
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), result);
 
             if (!_options.SuppressDefaultServiceCaller)
             {
@@ -303,8 +412,13 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
         }
         
-        public void GenerateAureliWebApiActions()
+        public void GenerateAureliaWebApiActions()
         {
+            if (_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("Aurelia actions are not supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
             var output = new StringBuilder("import {autoinject} from \"aurelia-dependency-injection\";\r\n");
             output.AppendLine("import {HttpClient, json, RequestInit} from \"aurelia-fetch-client\";\r\n");
             var requiredImports = new HashSet<string>();
@@ -398,15 +512,15 @@ namespace TypeScriptDefinitionsGenerator.Common
                 imports.AppendLine();
                 output.Insert(0, imports.ToString());
             }
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "actions.ts"), output.ToString());
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), output.ToString());
         }
 
 
-        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false)
+        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false, string optionsParameterName = "ajaxOptions")
         {
             var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + a.Type));
             if (result != "") result += ", ";
-            result += "ajaxOptions: " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
+            result += optionsParameterName + ": " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
             return result;
         }
 
@@ -426,6 +540,289 @@ namespace TypeScriptDefinitionsGenerator.Common
         {
             // TODO: Support ActionNameAttribute
             return action.Name.ToCamelCase();
+        }
+
+        private void GenerateAngularActions()
+        {
+            if (!_options.GenerateServiceStackRequests)
+            {
+                throw new Exception("Angular is only supported for ServiceStack APIs at the moment!  Please submit a Pull Request!");
+            }
+
+            var requiredImports = new HashSet<string>();
+            var allRequests = new List<string>();
+
+            var model = new ServiceStackApiModel();
+
+            foreach (var assemblyName in _options.Assemblies)
+            {
+                var assembly = Assembly.LoadFrom(assemblyName);
+                var requests = GetServiceStackRequestTypes(assembly);
+
+                foreach (var request in requests)
+                {
+                    var requestModel = new ServiceStackRequestModel();
+                    model.Requests.Add(requestModel);
+                    var returnType = _ssHelper.GetResponseTypeForRequest(request);
+                    var returnsVoid = _ssHelper.ReturnsVoid(request);
+
+                    var returnTypeTypeScriptName = returnsVoid ? "void" : (returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any");
+                    var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
+                    
+                    if (!routes.Any()) continue;
+                    allRequests.Add(request.Name);
+                    requestModel.ReturnTypeTypeScriptName = returnTypeTypeScriptName;
+
+                    requestModel.Name = request.Name;
+                    
+                    var items = new List<ServiceStackRouteInfo>();
+                    foreach (var route in routes)
+                    {
+                        var verbs = route.GetType().GetProperty("Verbs").GetValue(route) as string;
+                        var path = route.GetType().GetProperty("Path").GetValue(route) as string;
+
+                        foreach (var verb in verbs.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()))
+                        {
+                            if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
+
+                            var url = _ssHelper.GenerateUrlFromRoute(path, request, verb.Equals("get", StringComparison.OrdinalIgnoreCase), out var routeParameters);
+                            var routeInfo = new ServiceStackRouteInfo(verb, path, url, routeParameters);
+                            routeInfo.ReturnTypeTypeScriptName = requestModel.ReturnTypeTypeScriptName;
+                            items.Add(routeInfo);
+                            requestModel.Routes.Add(routeInfo);
+                        }
+                    }
+
+                    foreach (var item in items)
+                    {
+                        var actionParameters = _ssHelper.GetActionParameters(request, item);
+                        item.ActionParameters = actionParameters;
+                        if (item.Verb == "POST" || item.Verb == "PUT")
+                        {
+                            actionParameters.Add(new ActionParameterInfo
+                            {
+                                Name = "body",
+                                Type = TypeConverter.GetTypeScriptName(request)
+                            });
+                            actionParameters.ForEach(a =>
+                            {
+                                if (a.Type.Contains("."))
+                                {
+                                    foreach (var s in a.Type.GetTopLevelNamespaces())
+                                    {
+                                        requiredImports.Add(s);
+                                    }
+                                }
+                            }); 
+                            item.ActionParameters = actionParameters;
+                        }
+                    }
+                    
+//                    var gets = items.Where(i => i.Verb.Equals("GET", StringComparison.OrdinalIgnoreCase)).ToList();
+//                    if (gets.Any())
+//                    {
+//                        var item = gets.MaxBy(i => i.RouteParameters.Count);
+//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
+//                        item.ActionParameters = actionParameters;
+//                    }
+//                    var deletes = items.Where(i => i.Verb.Equals("DELETE", StringComparison.OrdinalIgnoreCase)).ToList();
+//                    if (deletes.Any())
+//                    {
+//                        var item = deletes.MaxBy(i => i.RouteParameters.Count);
+//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
+//                        item.ActionParameters = actionParameters;
+//                    }
+//                    var posts = items.Where(i => i.Verb.Equals("POST", StringComparison.OrdinalIgnoreCase)).ToList();
+//                    if (posts.Any())
+//                    {
+//                        var item = posts.MinBy(i => i.RouteParameters.Count);
+//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
+//                        actionParameters.Add(new ActionParameterInfo
+//                        {
+//                            Name = "body",
+//                            Type = TypeConverter.GetTypeScriptName(request)
+//                        });
+//                        actionParameters.ForEach(a =>
+//                        {
+//                            if (a.Type.Contains("."))
+//                            {
+//                                foreach (var s in a.Type.GetTopLevelNamespaces())
+//                                {
+//                                    requiredImports.Add(s);
+//                                }
+//                            }
+//                        }); 
+//                        item.ActionParameters = actionParameters;
+//                    }
+//                    var puts = items.Where(i => i.Verb.Equals("PUT", StringComparison.OrdinalIgnoreCase)).ToList();
+//                    if (puts.Any())
+//                    {
+//                        var item = puts.MinBy(i => i.RouteParameters.Count);
+//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
+//                        actionParameters.Add(new ActionParameterInfo
+//                        {
+//                            Name = "body",
+//                            Type = TypeConverter.GetTypeScriptName(request)
+//                        });
+//                        actionParameters.ForEach(a =>
+//                        {
+//                            if (a.Type.Contains("."))
+//                            {
+//                                foreach (var s in a.Type.GetTopLevelNamespaces())
+//                                {
+//                                    requiredImports.Add(s);
+//                                }
+//                            }
+//                        }); 
+//                        item.ActionParameters = actionParameters;
+//                    }
+                }
+            }
+
+            if (_options.GenerateAsModules)
+            {
+                model.RequiredImports = requiredImports.ToList();
+            }
+
+            SetupHelpers();
+            SetupTemplates("ServiceStack_Angular");
+            var actions = Handlebars.Compile("{{> main.hbs }}")(model);
+
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, _options.ActionsOutputFileName ?? "actions.ts"), actions);
+        }
+
+        public static void SetupHelpers()
+        {
+            Handlebars.RegisterHelper("StringReplace", (writer, context, parameters) =>
+            {
+                if (parameters.Length != 3) throw new HandlebarsException("{{StringReplace}} helper expects three parameters: input string, search text, replacement text");
+                writer.WriteSafeString(parameters[0].ToString().Replace(parameters[1].ToString(), parameters[2].ToString()));
+            });
+            Handlebars.RegisterHelper("StringReplaceLast", (writer, context, parameters) =>
+            {
+                if (parameters.Length != 3) throw new HandlebarsException("{{StringReplaceLast}} helper expects three parameters: input string, search text, replacement text");
+                writer.WriteSafeString(parameters[0].ToString().ReplaceLastOccurrence(parameters[1].ToString(), parameters[2].ToString()));
+            });
+            Handlebars.RegisterHelper("ToLower", (writer, context, parameters) =>
+            {
+                if (parameters.Length != 1) throw new HandlebarsException("{{ToLower}} helper expects one parameter: input string");
+                writer.WriteSafeString(parameters[0].ToString().ToLowerInvariant());
+            });
+            Handlebars.RegisterHelper("ToUpper", (writer, context, parameters) =>
+            {
+                if (parameters.Length != 1) throw new HandlebarsException("{{ToUpper}} helper expects one parameter: input string");
+                writer.WriteSafeString(parameters[0].ToString().ToUpperInvariant());
+            });
+            Handlebars.RegisterHelper("ToCamelCase", (writer, context, parameters) =>
+            {
+                if (parameters.Length != 1) throw new HandlebarsException("{{ToCamelCase}} helper expects one parameter: input string");
+                writer.WriteSafeString(parameters[0].ToString().ToCamelCase());
+            });
+
+            // Block helpers
+            Handlebars.RegisterHelper("AnyRequestsForVerb", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{StringReplace}} helper expects two parameters: input routes array, and http verb");
+                var list = parameters[0] as IList<ServiceStackRouteInfo>;
+                var verb = parameters[1] as string;
+                if (list.Any(x => x.Verb == verb)) options.Template(writer, null);
+                else options.Inverse(writer, null);
+            });
+            Handlebars.RegisterHelper("MaxRouteParametersForVerb", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{MaxRouteParametersForVerb}} helper expects two parameters: input routes array, and http verb");
+                var list = parameters[0] as IList<ServiceStackRouteInfo>;
+                var verb = parameters[1] as string;
+                if (!list.Any(x => x.Verb == verb)) options.Inverse(writer, null);
+                else options.Template(writer, list.Where(x => x.Verb == verb).MaxBy(i => i.RouteParameters.Count));
+            });
+            Handlebars.RegisterHelper("MinRouteParametersForVerb", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{MinRouteParametersForVerb}} helper expects two parameters: input routes array, and http verb");
+                var list = parameters[0] as IList<ServiceStackRouteInfo>;
+                var verb = parameters[1] as string;
+                if (!list.Any(x => x.Verb == verb)) options.Inverse(writer, null);
+                else options.Template(writer, list.Where(x => x.Verb == verb).MinBy(i => i.RouteParameters.Count));
+            });
+            Handlebars.RegisterHelper("IfEqualsAny", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length < 2) throw new HandlebarsException("{{IfEqualsAny}} helper expects at least two parameters: input string, and N number of matching strings");
+                var item = parameters[0].ToString();
+                var otherParameters = parameters.Skip(1).ToArray();
+                if (otherParameters.Any(x => x.Equals(item)))
+                    options.Template(writer, context);
+                else
+                    options.Inverse(writer, context);
+            });
+            Handlebars.RegisterHelper("IfEqualsAll", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length < 2) throw new HandlebarsException("{{IfEqualsAll}} helper expects at least two parameters: input string, and N number of matching strings");
+                var item = parameters[0].ToString();
+                var otherParameters = parameters.Skip(1).ToArray();
+                if (otherParameters.All(x => x.Equals(item)))
+                    options.Template(writer, context);
+                else
+                    options.Inverse(writer, context);
+            });
+            Handlebars.RegisterHelper("IfEqual", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfEquals}} helper expects at two parameters");
+                var item = parameters[0].ToString();
+                if (parameters[1].ToString().Equals(item))
+                    options.Template(writer, context);
+                else
+                    options.Inverse(writer, context);
+            });
+            Handlebars.RegisterHelper("IfNotEqual", (writer, options, context, parameters) =>
+            {
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfNotEquals}} helper expects at two parameters");
+                var item = parameters[0].ToString();
+                if (!parameters[1].ToString().Equals(item))
+                    options.Template(writer, context);
+                else
+                    options.Inverse(writer, context);
+            });
+
+        }
+        
+        public void SetupTemplates(string templateSet)
+        {
+            Console.WriteLine("Using custom templates at: " + _options.TemplateFolder);
+            DirectoryInfo customFolder = null;
+            if (!string.IsNullOrWhiteSpace(_options.TemplateFolder))
+            {
+                customFolder = new DirectoryInfo(_options.TemplateFolder);
+            }
+            
+            var resourceNames = typeof(MainGenerator).Assembly.GetManifestResourceNames();
+            foreach (var name in resourceNames)
+            {
+                if (name.StartsWith($"TypeScriptDefinitionsGenerator.Common.Templates.{templateSet}"))
+                {
+                    var key = name.Substring(name.GetSecondLastIndexOf("."));
+                    var customFile = customFolder?.GetFiles(key).FirstOrDefault();
+                    if (customFile != null)
+                    {
+                        using (var stream = customFile.OpenRead())
+                        using (var reader = new StreamReader(stream))
+                        {
+                            var template = reader.ReadToEnd();
+                            Console.WriteLine("[CUSTOM] KEY: " + key);
+                            Handlebars.RegisterTemplate(key, template);
+                        }
+                    }
+                    else
+                    {
+                        using (var resourceStream = typeof(MainGenerator).Assembly.GetManifestResourceStream(name))
+                        using (var reader = new StreamReader(resourceStream))
+                        {
+                            var template = reader.ReadToEnd();
+                            Console.WriteLine("KEY: " + key);
+                            Handlebars.RegisterTemplate(key, template);
+                        }
+                    }
+                }
+            }
         }
 
         private static string _interfaces = @"
