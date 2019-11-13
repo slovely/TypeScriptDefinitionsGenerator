@@ -23,6 +23,10 @@
                 <dependency id="Microsoft.NETCore.App" version="2.1.0" exclude="Build,Analyzers" />
                 <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
             </group>
+            <group targetFramework=".NETCoreApp3.0">
+                <dependency id="Microsoft.NETCore.App" version="3.0.0" exclude="Build,Analyzers" />
+                <dependency id="Newtonsoft.Json" version="12.0.3" exclude="Build,Analyzers" />
+            </group>
         </dependencies>
     </metadata>
     <files>
@@ -61,8 +65,18 @@
         <file src="bin\Release\CommandLine.dll" target="build\netcoreapp2.1\CommandLine.dll" />
         <file src="bin\Release\TypeLite.dll" target="build\netcoreapp2.1\TypeLite.dll" />
 
+        <!-- Core 3.0 stuff -->
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp3.0\TypeScriptDefinitionsGenerator.Core.dll" target="build\netcoreapp3.0\TypeScriptDefinitionsGenerator.Core.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp3.0\TypeScriptDefinitionsGenerator.Common.dll" target="build\netcoreapp3.0\TypeScriptDefinitionsGenerator.Common.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp3.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" target="build\netcoreapp3.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\netcoreapp3.0\Handlebars.dll" target="build\netcoreapp3.0\Handlebars.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\netcoreapp3.0\TypeScriptDefinitionsGenerator.targets" />
+        <file src="bin\Release\CommandLine.dll" target="build\netcoreapp3.0\CommandLine.dll" />
+        <file src="bin\Release\TypeLite.dll" target="build\netcoreapp3.0\TypeLite.dll" />
+
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.0\*.*" target="build\netcoreapp2.0\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.1\*.*" target="build\netcoreapp2.1\" />
+        <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp3.0\*.*" target="build\netcoreapp3.0\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\net46\*.*" target="build\net46\" />
     </files>
 

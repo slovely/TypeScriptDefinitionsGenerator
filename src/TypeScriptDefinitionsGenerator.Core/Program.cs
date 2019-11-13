@@ -14,7 +14,7 @@ namespace TypeScriptDefinitionsGenerator.Core
     {
         private const string workingPath = "working";
         private static WebApiUrlGenerator _urlGenerator = new WebApiUrlGenerator();
-        
+
         static void Main(string[] args)
         {
             Console.WriteLine("==============" + AppDomain.CurrentDomain.BaseDirectory);
@@ -37,8 +37,9 @@ namespace TypeScriptDefinitionsGenerator.Core
                 var configuration = new GenerationConfiguration();
                 configuration.ControllerPredicate = t =>
                 {
-                    // Dynamically check types, as might not be using AspNetCore (might be ServiceStack for example).
-                    var controllerBaseType = Type.GetType("Microsoft.AspNetCore.Mvc.Core.ControllerBase, Microsoft.AspNetCore.Mvc.Core");
+                    // Dynamically check types, as might not be using AspNetCore (might be ServiceStack for example).  Note that namespace moved in core v3
+                    var controllerBaseType = Type.GetType("Microsoft.AspNetCore.Mvc.Core.ControllerBase, Microsoft.AspNetCore.Mvc.Core")
+                        ?? Type.GetType("Microsoft.AspNetCore.Mvc.ControllerBase, Microsoft.AspNetCore.Mvc.Core");
                     if (controllerBaseType == null) return false;
                     return controllerBaseType.IsAssignableFrom(t);
                 };
