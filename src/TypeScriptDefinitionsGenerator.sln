@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator", "TypeScriptDefinitionsGenerator\TypeScriptDefinitionsGenerator.csproj", "{F1CD6B54-BFF3-4FC0-94AA-EAF34EEBC876}"
 EndProject
@@ -21,11 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptGenerator.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.Core", "TypeScriptDefinitionsGenerator.Core\TypeScriptDefinitionsGenerator.Core.csproj", "{29C2F3BA-8126-47C5-B4A1-8FA92CC59049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator.BuildSupport", "TypeScriptDefinitionsGenerator.BuildSupport\TypeScriptDefinitionsGenerator.BuildSupport.csproj", "{2583FAAE-B9DA-44D1-B97B-660AA000C0C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.BuildSupport", "TypeScriptDefinitionsGenerator.BuildSupport\TypeScriptDefinitionsGenerator.BuildSupport.csproj", "{2583FAAE-B9DA-44D1-B97B-660AA000C0C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptDefinitionsGenerator.Common", "TypeScriptDefinitionsGenerator.Common\TypeScriptDefinitionsGenerator.Common.csproj", "{5B8544B1-B528-404C-B076-78724D31AB4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptDefinitionsGenerator.Common", "TypeScriptDefinitionsGenerator.Common\TypeScriptDefinitionsGenerator.Common.csproj", "{5B8544B1-B528-404C-B076-78724D31AB4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptGenerator.Core.Tests", "TypeScriptGenerator.Core.Tests\TypeScriptGenerator.Core.Tests.csproj", "{E4F79B5B-5886-49CC-BEC9-ABA6EF0D35C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeScriptGenerator.Core.Tests", "TypeScriptGenerator.Core.Tests\TypeScriptGenerator.Core.Tests.csproj", "{E4F79B5B-5886-49CC-BEC9-ABA6EF0D35C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,15 +40,12 @@ Global
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6F345AC-E2F7-4DED-9BD4-437613BEF1E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F338FE9-45C5-432A-93AB-8827402747BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F338FE9-45C5-432A-93AB-8827402747BA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D064DC2-08FD-418A-ADD5-16F2D7FE19C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9853A84-18C9-4419-9F70-BD6F54E2563A}.Release|Any CPU.ActiveCfg = Release|Any CPU
