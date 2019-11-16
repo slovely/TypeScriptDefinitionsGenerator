@@ -597,7 +597,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                     {
                         var actionParameters = _ssHelper.GetActionParameters(request, item);
                         item.ActionParameters = actionParameters;
-                        if (item.Verb == "POST" || item.Verb == "PUT")
+                        if (item.Verb == "POST" || item.Verb == "PUT" || item.Verb == "PATCH")
                         {
                             actionParameters.Add(new ActionParameterInfo
                             {
@@ -617,65 +617,6 @@ namespace TypeScriptDefinitionsGenerator.Common
                             item.ActionParameters = actionParameters;
                         }
                     }
-                    
-//                    var gets = items.Where(i => i.Verb.Equals("GET", StringComparison.OrdinalIgnoreCase)).ToList();
-//                    if (gets.Any())
-//                    {
-//                        var item = gets.MaxBy(i => i.RouteParameters.Count);
-//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
-//                        item.ActionParameters = actionParameters;
-//                    }
-//                    var deletes = items.Where(i => i.Verb.Equals("DELETE", StringComparison.OrdinalIgnoreCase)).ToList();
-//                    if (deletes.Any())
-//                    {
-//                        var item = deletes.MaxBy(i => i.RouteParameters.Count);
-//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
-//                        item.ActionParameters = actionParameters;
-//                    }
-//                    var posts = items.Where(i => i.Verb.Equals("POST", StringComparison.OrdinalIgnoreCase)).ToList();
-//                    if (posts.Any())
-//                    {
-//                        var item = posts.MinBy(i => i.RouteParameters.Count);
-//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
-//                        actionParameters.Add(new ActionParameterInfo
-//                        {
-//                            Name = "body",
-//                            Type = TypeConverter.GetTypeScriptName(request)
-//                        });
-//                        actionParameters.ForEach(a =>
-//                        {
-//                            if (a.Type.Contains("."))
-//                            {
-//                                foreach (var s in a.Type.GetTopLevelNamespaces())
-//                                {
-//                                    requiredImports.Add(s);
-//                                }
-//                            }
-//                        }); 
-//                        item.ActionParameters = actionParameters;
-//                    }
-//                    var puts = items.Where(i => i.Verb.Equals("PUT", StringComparison.OrdinalIgnoreCase)).ToList();
-//                    if (puts.Any())
-//                    {
-//                        var item = puts.MinBy(i => i.RouteParameters.Count);
-//                        var actionParameters = _ssHelper.GetActionParameters(request, item);
-//                        actionParameters.Add(new ActionParameterInfo
-//                        {
-//                            Name = "body",
-//                            Type = TypeConverter.GetTypeScriptName(request)
-//                        });
-//                        actionParameters.ForEach(a =>
-//                        {
-//                            if (a.Type.Contains("."))
-//                            {
-//                                foreach (var s in a.Type.GetTopLevelNamespaces())
-//                                {
-//                                    requiredImports.Add(s);
-//                                }
-//                            }
-//                        }); 
-//                        item.ActionParameters = actionParameters;
-//                    }
                 }
             }
 

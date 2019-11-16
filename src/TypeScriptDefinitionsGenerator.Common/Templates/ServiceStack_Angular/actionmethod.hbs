@@ -1,5 +1,5 @@
 
-      {{ToLower Verb}}({{#each ActionParameters}}{{Name}}: {{{Type}}}, {{/each}}httpOptions: NgHttpOptions = undefined): Promise<{{{ReturnTypeTypeScriptName}}}> {
+      {{ToLower Verb}}({{#each ActionParameters}}{{Name}}: {{#IfEqual ../Verb 'PATCH'}}{{#IfEqual Name 'body'}}Partial<{{/IfEqual}}{{/IfEqual}}{{{Type}}}{{#IfEqual ../Verb 'PATCH'}}{{#IfEqual Name 'body'}}>{{/IfEqual}}{{/IfEqual}}, {{/each}}httpOptions: NgHttpOptions = {}): Observable<{{{ReturnTypeTypeScriptName}}}> {
       {{> methodbody.hbs }}
       }
       

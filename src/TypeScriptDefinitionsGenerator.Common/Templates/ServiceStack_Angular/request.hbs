@@ -3,7 +3,8 @@
     
     {{~MaxRouteParametersForVerb Routes 'GET'}}{{> actionmethod.hbs}}{{/MaxRouteParametersForVerb}}
     {{~MaxRouteParametersForVerb Routes 'DELETE'}}{{> actionmethod.hbs}}{{/MaxRouteParametersForVerb}}
-    {{~MaxRouteParametersForVerb Routes 'POST'}}{{> actionmethod.hbs}}{{/MaxRouteParametersForVerb}}
-    {{~MaxRouteParametersForVerb Routes 'PUT'}}{{> actionmethod.hbs}}{{/MaxRouteParametersForVerb}}
+    {{~MinRouteParametersForVerb Routes 'POST'}}{{> actionmethod.hbs}}{{/MinRouteParametersForVerb}}
+    {{~MinRouteParametersForVerb Routes 'PUT'}}{{> actionmethod.hbs}}{{/MinRouteParametersForVerb}}
+    {{~MinRouteParametersForVerb Routes 'PATCH'}}{{> actionmethod.hbs}}{{/MinRouteParametersForVerb}}
   }
 

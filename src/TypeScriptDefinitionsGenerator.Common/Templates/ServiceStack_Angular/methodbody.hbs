@@ -1,1 +1,1 @@
-        return this.http.{{ToLower Verb}}<{{{ReturnTypeTypeScriptName}}}>({{{Url}}}, {{IfEqualsAny Verb 'POST' 'PUT'}}body, {{/IfEqualsAny}}httpOptions).toPromise();
+        return this.http.{{ToLower Verb}}<{{{ReturnTypeTypeScriptName}}}>({{{Url}}}, {{IfEqualsAny Verb 'POST' 'PUT' 'PATCH'}}body, {{/IfEqualsAny}}httpOptions).toPromise();
