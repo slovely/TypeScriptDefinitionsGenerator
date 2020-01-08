@@ -606,7 +606,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                             });
                             actionParameters.ForEach(a =>
                             {
-                                if (a.Type.Contains("."))
+                                if (a.Type.Contains(".") && !a.Type.StartsWith("Enums."))
                                 {
                                     foreach (var s in a.Type.GetTopLevelNamespaces())
                                     {
