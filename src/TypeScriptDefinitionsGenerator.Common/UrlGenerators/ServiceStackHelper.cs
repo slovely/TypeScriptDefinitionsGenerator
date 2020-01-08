@@ -81,7 +81,7 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
                 var property = request.GetProperty(parameter) ?? request.GetProperty(parameter.ToPascalCase());
                 param.Name = property?.Name ?? parameter;
                 param.Type = property == null ? "any" : TypeConverter.GetTypeScriptName(property.PropertyType);
-                if (property?.PropertyType.IsEnum == true) param.Type = "Enums." + param.Type;
+                if (property != null && (property.PropertyType.IsEnum || Nullable.GetUnderlyingType(property.PropertyType) != null)) param.Type = "Enums." + param.Type;
                 param.FromUri = true;
                 param.ClrType = property?.PropertyType;
 
