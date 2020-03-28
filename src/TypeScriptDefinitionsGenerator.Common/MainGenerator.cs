@@ -561,61 +561,73 @@ namespace TypeScriptDefinitionsGenerator.Common
 
                 foreach (var request in requests)
                 {
-                    var requestModel = new ServiceStackRequestModel();
-                    model.Requests.Add(requestModel);
-                    var returnType = _ssHelper.GetResponseTypeForRequest(request);
-                    var returnsVoid = _ssHelper.ReturnsVoid(request);
-
-                    var returnTypeTypeScriptName = returnsVoid ? "void" : (returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any");
-                    var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
-                    
-                    if (!routes.Any()) continue;
-                    allRequests.Add(request.Name);
-                    requestModel.ReturnTypeTypeScriptName = returnTypeTypeScriptName;
-
-                    requestModel.Name = request.Name;
-                    
-                    var items = new List<ServiceStackRouteInfo>();
-                    foreach (var route in routes)
+                    try
                     {
-                        var verbs = route.GetType().GetProperty("Verbs").GetValue(route) as string;
-                        var path = route.GetType().GetProperty("Path").GetValue(route) as string;
+                        var requestModel = new ServiceStackRequestModel();
+                        model.Requests.Add(requestModel);
+                        var returnType = _ssHelper.GetResponseTypeForRequest(request);
+                        var returnsVoid = _ssHelper.ReturnsVoid(request);
 
-                        foreach (var verb in verbs.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()))
+                        var returnTypeTypeScriptName = returnsVoid ? "void" : (returnType != null ? TypeConverter.GetTypeScriptName(returnType) : "any");
+                        var routes = request.GetCustomAttributes().Where(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute");
+
+                        if (!routes.Any()) continue;
+                        allRequests.Add(request.Name);
+                        requestModel.ReturnTypeTypeScriptName = returnTypeTypeScriptName;
+
+                        requestModel.Name = request.Name;
+
+                        var items = new List<ServiceStackRouteInfo>();
+                        foreach (var route in routes)
                         {
-                            if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
+                            var verbs = route.GetType().GetProperty("Verbs").GetValue(route) as string;
+                            var path = route.GetType().GetProperty("Path").GetValue(route) as string;
 
-                            var url = _ssHelper.GenerateUrlFromRoute(path, request, verb.Equals("get", StringComparison.OrdinalIgnoreCase), out var routeParameters);
-                            var routeInfo = new ServiceStackRouteInfo(verb, path, url, routeParameters);
-                            routeInfo.ReturnTypeTypeScriptName = requestModel.ReturnTypeTypeScriptName;
-                            items.Add(routeInfo);
-                            requestModel.Routes.Add(routeInfo);
+                            if (string.IsNullOrWhiteSpace(verbs)) throw new Exception("No HTTP verbs defined");
+                            if (string.IsNullOrWhiteSpace(path)) throw new Exception("No route path defined");
+
+                            foreach (var verb in verbs.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()))
+                            {
+                                if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
+
+                                var url = _ssHelper.GenerateUrlFromRoute(path, request, verb.Equals("get", StringComparison.OrdinalIgnoreCase), out var routeParameters);
+                                var routeInfo = new ServiceStackRouteInfo(verb, path, url, routeParameters);
+                                routeInfo.ReturnTypeTypeScriptName = requestModel.ReturnTypeTypeScriptName;
+                                items.Add(routeInfo);
+                                requestModel.Routes.Add(routeInfo);
+                            }
+                        }
+
+                        foreach (var item in items)
+                        {
+                            var actionParameters = _ssHelper.GetActionParameters(request, item);
+                            item.ActionParameters = actionParameters;
+                            if (item.Verb == "POST" || item.Verb == "PUT" || item.Verb == "PATCH")
+                            {
+                                actionParameters.Add(new ActionParameterInfo
+                                {
+                                    Name = "body",
+                                    Type = TypeConverter.GetTypeScriptName(request)
+                                });
+                                actionParameters.ForEach(a =>
+                                {
+                                    if (a.Type.Contains(".") && !a.Type.StartsWith("Enums."))
+                                    {
+                                        foreach (var s in a.Type.GetTopLevelNamespaces())
+                                        {
+                                            requiredImports.Add(s);
+                                        }
+                                    }
+                                });
+                                item.ActionParameters = actionParameters;
+                            }
                         }
                     }
-
-                    foreach (var item in items)
+                    catch (Exception ex)
                     {
-                        var actionParameters = _ssHelper.GetActionParameters(request, item);
-                        item.ActionParameters = actionParameters;
-                        if (item.Verb == "POST" || item.Verb == "PUT" || item.Verb == "PATCH")
-                        {
-                            actionParameters.Add(new ActionParameterInfo
-                            {
-                                Name = "body",
-                                Type = TypeConverter.GetTypeScriptName(request)
-                            });
-                            actionParameters.ForEach(a =>
-                            {
-                                if (a.Type.Contains(".") && !a.Type.StartsWith("Enums."))
-                                {
-                                    foreach (var s in a.Type.GetTopLevelNamespaces())
-                                    {
-                                        requiredImports.Add(s);
-                                    }
-                                }
-                            }); 
-                            item.ActionParameters = actionParameters;
-                        }
+                        Console.WriteLine("Failure processing request type: " + request.FullName);
+                        Console.WriteLine("Message: " + ex.Message);
+                        throw;
                     }
                 }
             }
