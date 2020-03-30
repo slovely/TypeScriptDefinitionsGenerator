@@ -26,17 +26,17 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
                 return "";
             }
             Console.WriteLine(hubs.Count + " SignalR hubs found");
-            var requiredImports = new HashSet<string>();
+            var requiredClassImports = new HashSet<string>();
             foreach (var hub in hubs)
             {
-                requiredImports.Add(hub.Namespace.Split('.')[0]);
+                requiredClassImports.Add(hub.FullName.GetTopLevelNamespaces()[0]);
             }
 
             var scriptBuilder = new ScriptBuilder("    ");
 
             scriptBuilder.AppendLine();
 
-            hubs.ForEach(h => GenerateHubInterfaces(h, scriptBuilder, generateAsModules, requiredImports));
+            hubs.ForEach(h => GenerateHubInterfaces(h, scriptBuilder, generateAsModules, requiredClassImports));
 
             // Generate client connection interfaces
             if (generateAsModules) scriptBuilder.Append("export ");
@@ -54,7 +54,8 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
             if (generateAsModules)
             {
                 var imports ="import Classes = require(\"./classes\");\r\n";
-                foreach (var ns in requiredImports)
+                imports += "import * as __Enums from \"./enums\";\r\n";
+                foreach (var ns in requiredClassImports)
                 {
                     imports += string.Format("import {0} = Classes.{0};\r\n", ns);
                 }
@@ -122,22 +123,32 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
             var result = methodInfo.Name.ToCamelCase() + "(";
             result += string.Join(", ", methodInfo.GetParameters().Select(param =>
             {
+                var isEnum = param.ParameterType.IsEnum || (param.ParameterType.IsNullable() && param.ParameterType.GetEnumUnderlyingType().IsEnum);
                 var typeScriptName = TypeConverter.GetTypeScriptName(param.ParameterType);
-                foreach (var ns in typeScriptName.GetTopLevelNamespaces())
+                if (!isEnum)
                 {
-                    requiredImports.Add(ns);
+                    foreach (var ns in typeScriptName.GetTopLevelNamespaces())
+                    {
+                        requiredImports.Add(ns);
+                    }
                 }
-                return param.Name + ": " + typeScriptName;
+                return param.Name + ": " + (isEnum ? "__Enums." : "") + typeScriptName;
             }));
-            
-            var returnTypeName = TypeConverter.GetTypeScriptName(methodInfo.ReturnType);
-            returnTypeName = returnTypeName == "void" ? "void" : "Promise<" + returnTypeName + ">";
-            foreach (var ns in returnTypeName.GetTopLevelNamespaces())
+
             {
-                requiredImports.Add(ns);
+                var returnTypeName = TypeConverter.GetTypeScriptName(methodInfo.ReturnType);
+                var isEnum = methodInfo.ReturnType.IsEnum || (methodInfo.ReturnType.IsNullable() && methodInfo.ReturnType.GetEnumUnderlyingType().IsEnum);
+                returnTypeName = returnTypeName == "void" ? "void" : "Promise<" + (isEnum ? "__Enums." : "") + returnTypeName + ">";
+                if (!isEnum)
+                {
+                    foreach (var ns in returnTypeName.GetTopLevelNamespaces())
+                    {
+                        requiredImports.Add(ns);
+                    }
+                }
+
+                result += "): " + returnTypeName + ";";
             }
-            
-            result += "): " + returnTypeName + ";";
             return result;
         }
     }
