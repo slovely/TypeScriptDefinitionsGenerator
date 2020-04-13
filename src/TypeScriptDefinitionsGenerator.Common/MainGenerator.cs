@@ -504,10 +504,12 @@ namespace TypeScriptDefinitionsGenerator.Common
             if (_options.GenerateAsModules)
             {
                 var imports = new StringBuilder();
-                imports.AppendLine("import Classes = require(\"./classes\");");
+                imports.AppendLine("import * as Classes from \"./classes\";");
+                imports.AppendLine("import * as Enums from \"./enums\";");
                 foreach (var ns in requiredImports)
                 {
-                    imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);
+                    if (ns != "Enums")
+                        imports.AppendFormat("import {0} = Classes.{0};\r\n", ns);
                 }
                 imports.AppendLine();
                 output.Insert(0, imports.ToString());
