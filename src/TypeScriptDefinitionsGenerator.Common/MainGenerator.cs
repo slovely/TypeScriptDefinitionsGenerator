@@ -307,6 +307,7 @@ namespace TypeScriptDefinitionsGenerator.Common
 
                 Console.WriteLine("Processing Type: " + clrTypeToUse);
                 if (clrTypeToUse == typeof(string) || clrTypeToUse.IsPrimitive || clrTypeToUse == typeof(object)) continue;
+                if (clrTypeToUse.FullName.StartsWith("Microsoft.AspNetCore.Mvc.ActionResult`1")) continue;
 
                 if (clrTypeToUse.IsArray)
                 {
@@ -453,7 +454,10 @@ namespace TypeScriptDefinitionsGenerator.Common
 
                         var httpMethod = GetHttpMethod(action);
                         var actionName = GetActionName(action);
-                        var returnType = TypeConverter.GetTypeScriptName(action.ReturnType);
+                        var returnType =
+                            action.ReturnType.FullName?.StartsWith("Microsoft.AspNetCore.Mvc.ActionResult`1") == true
+                            ? TypeConverter.GetTypeScriptName(action.ReturnType.GetGenericArguments().First())
+                            : TypeConverter.GetTypeScriptName(action.ReturnType);
                         if (returnType.Contains("."))
                         {
                             foreach (var s in returnType.GetTopLevelNamespaces())
