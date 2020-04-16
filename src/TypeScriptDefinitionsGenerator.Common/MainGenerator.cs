@@ -248,7 +248,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                 );
             ProcessMethods(actions, generator);
 
-            var signalrHubs = assembly.GetTypes().Where(t => t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(_configuration.SignalRGenerator.IHUB_TYPE) == true));
+            var signalrHubs = assembly.GetTypes().Where(t => _configuration.SignalRGenerator.IsHub(t));
             var methods = signalrHubs
                 .SelectMany(h => h.GetMethods()
                     .Where(m => m.IsPublic)
@@ -295,6 +295,10 @@ namespace TypeScriptDefinitionsGenerator.Common
                     }
                     else continue; // Ignore non-generic Task as we can't know what type it will really be
                 }
+                if (clrTypeToUse.FullName?.StartsWith("Microsoft.AspNetCore.Mvc.ActionResult`1") == true)
+                {
+                    clrTypeToUse = clrType.GetGenericArguments().First();
+                }
                 if (clrTypeToUse.IsNullable())
                 {
                     clrTypeToUse = clrTypeToUse.GetUnderlyingNullableType();
@@ -307,7 +311,6 @@ namespace TypeScriptDefinitionsGenerator.Common
 
                 Console.WriteLine("Processing Type: " + clrTypeToUse);
                 if (clrTypeToUse == typeof(string) || clrTypeToUse.IsPrimitive || clrTypeToUse == typeof(object)) continue;
-                if (clrTypeToUse.FullName.StartsWith("Microsoft.AspNetCore.Mvc.ActionResult`1")) continue;
 
                 if (clrTypeToUse.IsArray)
                 {

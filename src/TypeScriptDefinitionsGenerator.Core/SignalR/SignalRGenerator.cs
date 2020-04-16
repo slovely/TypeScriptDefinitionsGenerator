@@ -11,7 +11,10 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
     public class SignalRGenerator : BaseSignalRGenerator
     {
         private const string HUB_TYPE = "Microsoft.AspNetCore.SignalR.Hub";
-        public override string IHUB_TYPE { get; } = "Microsoft.AspNetCore.SignalR.Hubs.IHub";
+        public override bool IsHub(Type t)
+        {
+            return GetAllBaseTypes(t).Select(x => x.FullName).Contains("Microsoft.AspNetCore.SignalR.Hub");
+        }
 
         public override string GenerateHubs(Assembly assembly, bool generateAsModules)
         {
@@ -64,6 +67,17 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
             }
 
             return output;
+        }
+
+        private List<Type> GetAllBaseTypes(Type type)
+        {
+            var result = new List<Type>();
+            while (type != null)
+            {
+                result.Add(type);
+                type = type.BaseType;
+            }
+            return result;
         }
 
         private void GenerateHubInterfaces(Type hubType, ScriptBuilder scriptBuilder, bool generateAsModules, HashSet<string> requiredImports)

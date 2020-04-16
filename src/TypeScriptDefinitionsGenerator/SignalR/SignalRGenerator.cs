@@ -9,8 +9,13 @@ namespace TypeScriptDefinitionsGenerator.SignalR
 {
     public class SignalRGenerator : BaseSignalRGenerator
     {
-        public const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
-        public override string IHUB_TYPE => "Microsoft.AspNet.SignalR.Hubs.IHub";
+        private const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
+        private const string IHUB_TYPE = "Microsoft.AspNet.SignalR.Hubs.IHub";
+        public override bool IsHub(Type t)
+        {
+            return t.GetInterfaces().ToList().Exists(i => i != null && i.FullName?.Contains(IHUB_TYPE) == true);
+        }
+
 
         public override string GenerateHubs(Assembly assembly, bool generateAsModules)
         {
