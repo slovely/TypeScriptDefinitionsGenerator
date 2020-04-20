@@ -58,18 +58,11 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
             var parameters = requestDto.GetProperties()
                 .Where(p => p.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.ApiMemberAttribute"))
                 .ToList();
-            var result = string.Join("&", parameters.Where(a =>
+            if (parameters.Any(x => !routeParameters.Contains(x.Name.ToCamelCase())))
             {
-                var paramName = a.Name.ToCamelCase();
-                return !routeParameters.Contains(paramName);
-            }).Select(a =>
-            {
-                var name = a.Name.ToCamelCase();
-                routeParameters.Add(name);
-                return $"\" + ({name} ? \"{name}=\" + {name} : \"\") + \"";
-            }));
-            if (result != "") result = "?" + result;
-            return result;
+                return "?\" + Object.keys(querystring).filter(x => querystring[x]).map(key => key + '=' + querystring[key]).join('&') + \" ";
+            }
+            return "";
         }
 
         public List<ActionParameterInfo> GetActionParameters(Type request, ServiceStackRouteInfo routeInfo)

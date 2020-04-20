@@ -310,7 +310,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                 }
 
                 Console.WriteLine("Processing Type: " + clrTypeToUse);
-                if (clrTypeToUse == typeof(string) || clrTypeToUse.IsPrimitive || clrTypeToUse == typeof(object)) continue;
+                if (clrTypeToUse == typeof(string) || clrTypeToUse.IsPrimitive || clrTypeToUse == typeof(object) || clrTypeToUse == typeof(DateTime)) continue;
 
                 if (clrTypeToUse.IsArray)
                 {
@@ -599,8 +599,10 @@ namespace TypeScriptDefinitionsGenerator.Common
                             {
                                 if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
 
-                                var url = _ssHelper.GenerateUrlFromRoute(path, request, verb.Equals("get", StringComparison.OrdinalIgnoreCase), out var routeParameters);
-                                var routeInfo = new ServiceStackRouteInfo(verb, path, url, routeParameters);
+                                var isGet = verb.Equals("get", StringComparison.OrdinalIgnoreCase);
+                                var url = _ssHelper.GenerateUrlFromRoute(path, request, isGet, out var routeParameters);
+                                var rawUrl = _ssHelper.GenerateUrlFromRoute(path, request, false, out _);
+                                var routeInfo = new ServiceStackRouteInfo(verb, path, url, rawUrl, routeParameters);
                                 routeInfo.ReturnTypeTypeScriptName = requestModel.ReturnTypeTypeScriptName;
                                 items.Add(routeInfo);
                                 requestModel.Routes.Add(routeInfo);
@@ -611,11 +613,11 @@ namespace TypeScriptDefinitionsGenerator.Common
                         {
                             var actionParameters = _ssHelper.GetActionParameters(request, item);
                             item.ActionParameters = actionParameters;
-                            if (item.Verb == "POST" || item.Verb == "PUT" || item.Verb == "PATCH")
+                            if (item.Verb == "POST" || item.Verb == "PUT" || item.Verb == "PATCH" || item.Verb == "GET")
                             {
                                 actionParameters.Add(new ActionParameterInfo
                                 {
-                                    Name = "body",
+                                    Name = item.Verb == "GET" ? "querystring" : "body",
                                     Type = TypeConverter.GetTypeScriptName(request)
                                 });
                                 actionParameters.ForEach(a =>
@@ -728,7 +730,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             });
             Handlebars.RegisterHelper("IfEqual", (writer, options, context, parameters) =>
             {
-                if (parameters.Length != 2) throw new HandlebarsException("{{IfEquals}} helper expects at two parameters");
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfEquals}} helper expects two parameters");
                 var item = parameters[0].ToString();
                 if (parameters[1].ToString().Equals(item))
                     options.Template(writer, context);
@@ -737,7 +739,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             });
             Handlebars.RegisterHelper("IfNotEqual", (writer, options, context, parameters) =>
             {
-                if (parameters.Length != 2) throw new HandlebarsException("{{IfNotEquals}} helper expects at two parameters");
+                if (parameters.Length != 2) throw new HandlebarsException("{{IfNotEquals}} helper expects two parameters");
                 var item = parameters[0].ToString();
                 if (!parameters[1].ToString().Equals(item))
                     options.Template(writer, context);

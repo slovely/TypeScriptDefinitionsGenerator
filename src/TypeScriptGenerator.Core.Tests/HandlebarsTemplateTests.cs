@@ -43,8 +43,8 @@ namespace TypeScriptGenerator.Core.Tests
             });
 
             var model = new ServiceStackRequestModel();
-            model.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url2", new List<string> {"test"}));
-            model.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url", new List<string>()));
+            model.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url2", "", new List<string> {"test"}));
+            model.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url", "", new List<string>()));
             var template = "{{MaxRouteParametersForVerb Routes 'GET'}}{{Url}}{{/MaxRouteParametersForVerb}}";
             var compiledTemplate = Handlebars.Compile(template);
             var templateOutput = compiledTemplate(model);
@@ -63,8 +63,8 @@ namespace TypeScriptGenerator.Core.Tests
             var model = new ServiceStackApiModel();
             var requestModel = new ServiceStackRequestModel {Name = "MyRequest", ReturnTypeTypeScriptName = "string"};
             model.Requests.Add(requestModel);
-            requestModel.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url2", new List<string> {"test"}));
-            requestModel.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url", new List<string>()));
+            requestModel.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url2", "", new List<string> {"test"}));
+            requestModel.Routes.Add(new ServiceStackRouteInfo("GET", "path", "url", "", new List<string>()));
             
             var compiledTemplate = Handlebars.Compile("{{> main.hbs }}");
             var templateOutput = compiledTemplate(model);
