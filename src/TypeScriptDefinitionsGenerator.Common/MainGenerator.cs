@@ -231,6 +231,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                 .Where(type => type.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.RouteAttribute"))
                 // ONLY INCLUDE TYPES WITH AN IRETURN<T> OR IRETURNVOID FOR NOW!
                 .Where(type => _ssHelper.GetResponseTypeForRequest(type) != null || _ssHelper.ReturnsVoid(type))
+                .Where(type => !_options.ActionsExplicitOptIn || type.GetCustomAttributes(true).Any(attr => attr.GetType().Name == "GenerateTypeScriptAttribute"))
                 .OrderBy(t => t.Name)
                 .ToList();
         }

@@ -35,6 +35,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         public bool CamelCase { get; set; }
         [Option("actionsOutputFileName", HelpText = "Set the output filename for the actions file.  Default: actions.ts", DefaultValue = "actions.ts")]
         public string ActionsOutputFileName { get; set; }
+        [Option("actionsExplicitOptIn", HelpText = "Whether API methods require opt-in attribute, or all are generated", DefaultValue = false)]
+        public bool ActionsExplicitOptIn { get; set; }
     }
 
     public enum ActionsStyle
