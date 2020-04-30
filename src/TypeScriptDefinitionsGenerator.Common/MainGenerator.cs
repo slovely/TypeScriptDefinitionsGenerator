@@ -619,7 +619,7 @@ namespace TypeScriptDefinitionsGenerator.Common
                                 actionParameters.Add(new ActionParameterInfo
                                 {
                                     Name = item.Verb == "GET" ? "querystring" : "body",
-                                    Type = item.Verb == "GET" && item.RouteParameters.Any()
+                                    Type = item.RouteParameters.Any()
                                         ? $"Omit<{TypeConverter.GetTypeScriptName(request)}, {string.Join(" | ", item.RouteParameters.Select(p => $"'{p}'"))}>"
                                         : TypeConverter.GetTypeScriptName(request)
                                 });
