@@ -526,9 +526,13 @@ namespace TypeScriptDefinitionsGenerator.Common
         }
 
 
-        private static string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false, string optionsParameterName = "ajaxOptions")
+        private string GetMethodParameters(List<ActionParameterInfo> actionParameters, string settingsType, bool useUndefinedForSettingsType = false, string optionsParameterName = "ajaxOptions")
         {
-            var result = string.Join(", ", actionParameters.Select(a => a.Name + ": " + a.Type));
+            var result = string.Join(", ", actionParameters.Select(a =>
+                a.Name + ": " + (_options.GenerateAsModules && a.ClrType != null && (a.ClrType.IsEnum || Nullable.GetUnderlyingType(a.ClrType)?.IsEnum == true)
+                    ? "Enums."
+                    : "")
+                + a.Type));
             if (result != "") result += ", ";
             result += optionsParameterName + ": " + settingsType + (useUndefinedForSettingsType ? " = undefined" : " = null");
             return result;
