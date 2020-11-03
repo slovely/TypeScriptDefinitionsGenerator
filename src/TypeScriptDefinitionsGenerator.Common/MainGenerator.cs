@@ -107,8 +107,8 @@ namespace TypeScriptDefinitionsGenerator.Common
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
-            if (_options.SupportMomentJs)
-                generator = generator.WithConvertor<DateTime>(c => "Date | Moment");
+            // if (_options.SupportMomentJs)
+            //     generator = generator.WithConvertor<DateTime>(c => "Date | Moment");
 
             generator.WithMemberFormatter(i =>
             {
