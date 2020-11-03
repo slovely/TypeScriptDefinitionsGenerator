@@ -37,6 +37,8 @@ namespace TypeScriptDefinitionsGenerator.Common
         public string ActionsOutputFileName { get; set; }
         [Option("actionsExplicitOptIn", HelpText = "Whether API methods require opt-in attribute, or all are generated", DefaultValue = false)]
         public bool ActionsExplicitOptIn { get; set; }
+        [Option("supportMomentJs", HelpText = "Whether generated code supports moment js dates", DefaultValue = false)]
+        public bool SupportMomentJs { get; set; }
     }
 
     public enum ActionsStyle

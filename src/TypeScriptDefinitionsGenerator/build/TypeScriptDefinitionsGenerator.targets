@@ -75,10 +75,11 @@
       <TsGenTemplateFolder Condition="'$(TsGenTemplateFolder)' != ''">--templateFolder $(TsGenTemplateFolder)</TsGenTemplateFolder>
       <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilename)</TsGenActionsFilename>
       <TsGenApiExplicitOptIn Condition="'$(TsGenApiExplicitOptIn)' == 'true'">--actionsExplicitOptIn</TsGenApiExplicitOptIn>
+      <TsGenMomentJsSupport Condition="'$(TsGenMomentJsSupport)' == 'true'">--supportMomentJs</TsGenMomentJsSupport>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename) $(TsGenApiExplicitOptIn)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename) $(TsGenApiExplicitOptIn) $(TsGenMomentJsSupport)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>

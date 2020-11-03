@@ -25,7 +25,7 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
             return null;
         }
 
-        public string GenerateUrlFromRoute(string path, Type requestDto, bool includeQueryStringParams, out List<string> routeParameters)
+        public string GenerateUrlFromRoute(string path, Type requestDto, bool includeQueryStringParams, bool supportMomentJs, out List<string> routeParameters)
         {
             var routeParametersList = new List<string>();
             routeParameters = routeParametersList;
@@ -46,21 +46,23 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
                     });
                 }
             }
-            var queryString = includeQueryStringParams ? GetQueryStringParameters(requestDto, routeParameters) : null;
+            var queryString = includeQueryStringParams ? GetQueryStringParameters(requestDto, routeParameters, supportMomentJs) : null;
             if (string.IsNullOrEmpty(queryString))
                 return "\"" + result.TrimStart('/') + "\"";
 
             return "\"" + result.TrimStart('/') + queryString + "\"";
         }
 
-        private string GetQueryStringParameters(Type requestDto, List<string> routeParameters)
+        private string GetQueryStringParameters(Type requestDto, List<string> routeParameters, bool supportMomentJs)
         {
             var parameters = requestDto.GetProperties()
                 .Where(p => p.GetCustomAttributes().Any(attr => attr.GetType().FullName == "ServiceStack.ApiMemberAttribute"))
                 .ToList();
             if (parameters.Any(x => !routeParameters.Contains(x.Name.ToCamelCase())))
             {
-                return "?\" + Object.keys(querystring).filter(x => querystring[x]).map(key => key + '=' + (querystring[key] instanceof Date ? querystring[key].toISOString() : querystring[key])).join('&') + \" ";
+                return "?\" + Object.keys(querystring).filter(x => querystring[x]).map(key => key + '=' + (querystring[key] instanceof Date" +
+                       (supportMomentJs ? " || moment.isMoment(querystring[key])" : "") +
+                       " ? querystring[key].toISOString() : querystring[key])).join('&') + \" ";
             }
             return "";
         }

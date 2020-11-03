@@ -107,6 +107,9 @@ namespace TypeScriptDefinitionsGenerator.Common
             var generator = new TypeScriptFluent()
                 .WithConvertor<Guid>(c => "string");
 
+            if (_options.SupportMomentJs)
+                generator = generator.WithConvertor<DateTime>(c => "Date | Moment");
+
             generator.WithMemberFormatter(i =>
             {
                 var identifier = i.Name;
@@ -187,8 +190,11 @@ namespace TypeScriptDefinitionsGenerator.Common
                     }
                     return p.PropertyType is TsEnum ? "__Enums." + n : n;
                 });
-                var tsClassDefinitions = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
-                tsClassDefinitions = "import * as __Enums from \"./enums\";\r\n\r\n" + tsClassDefinitions;
+                var tsGeneratedCode = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
+                var tsClassDefinitions = "import * as __Enums from \"./enums\";\r\n\r\n";
+                if (_options.SupportMomentJs)
+                    tsClassDefinitions += "import {Moment} from \"moment\";\r\n";
+                tsClassDefinitions += tsGeneratedCode;
                 tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
                 tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",
@@ -605,8 +611,8 @@ namespace TypeScriptDefinitionsGenerator.Common
                                 if (verb.Equals("Options", StringComparison.OrdinalIgnoreCase)) continue;
 
                                 var isGet = verb.Equals("get", StringComparison.OrdinalIgnoreCase);
-                                var url = _ssHelper.GenerateUrlFromRoute(path, request, isGet, out var routeParameters);
-                                var rawUrl = _ssHelper.GenerateUrlFromRoute(path, request, false, out _);
+                                var url = _ssHelper.GenerateUrlFromRoute(path, request, isGet, _options.SupportMomentJs, out var routeParameters);
+                                var rawUrl = _ssHelper.GenerateUrlFromRoute(path, request, false, _options.SupportMomentJs, out _);
                                 var routeInfo = new ServiceStackRouteInfo(verb, path, url, rawUrl, routeParameters);
                                 routeInfo.ReturnTypeTypeScriptName = requestModel.ReturnTypeTypeScriptName;
                                 items.Add(routeInfo);

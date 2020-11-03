@@ -62,6 +62,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                 configuration.SignalRGenerator = new SignalRGenerator();
                 configuration.GetActionParameters = WebApiUrlGenerator.GetActionParameters;
                 configuration.UrlGenerator = new WebApiUrlGenerator();
+                options.SupportMomentJs = true;
                 var mainGenerator = new MainGenerator(options, configuration);
                 mainGenerator.SetupWorkingFolder();
                 try
