@@ -85,10 +85,20 @@
         <file src="bin\Release\CommandLine.dll" target="build\netcoreapp3.1\CommandLine.dll" />
         <file src="bin\Release\TypeLite.dll" target="build\netcoreapp3.1\TypeLite.dll" />
 
+        <!-- Net 5.0 stuff -->
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\net5.0\TypeScriptDefinitionsGenerator.Core.dll" target="build\net5.0\TypeScriptDefinitionsGenerator.Core.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\net5.0\TypeScriptDefinitionsGenerator.Common.dll" target="build\net5.0\TypeScriptDefinitionsGenerator.Common.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\net5.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" target="build\net5.0\TypeScriptDefinitionsGenerator.Core.runtimeconfig.json" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\bin\Release\net5.0\Handlebars.dll" target="build\net5.0\Handlebars.dll" />
+        <file src="..\TypeScriptDefinitionsGenerator.Core\build\TypeScriptDefinitionsGenerator.targets" target="build\net5.0\TypeScriptDefinitionsGenerator.targets" />
+        <file src="bin\Release\CommandLine.dll" target="build\net5.0\CommandLine.dll" />
+        <file src="bin\Release\TypeLite.dll" target="build\net5.0\TypeLite.dll" />
+
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.0\*.*" target="build\netcoreapp2.0\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp2.1\*.*" target="build\netcoreapp2.1\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp3.0\*.*" target="build\netcoreapp3.0\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\netcoreapp3.1\*.*" target="build\netcoreapp3.1\" />
+        <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\net5.0\*.*" target="build\net5.0\" />
         <file src="..\TypeScriptDefinitionsGenerator.BuildSupport\bin\release\net46\*.*" target="build\net46\" />
     </files>
 
