@@ -60,7 +60,7 @@ namespace TypeScriptDefinitionsGenerator.Common.UrlGenerators
                 .ToList();
             if (parameters.Any(x => !routeParameters.Contains(x.Name.ToCamelCase())))
             {
-                return "?\" + Object.keys(querystring).filter(x => querystring[x]).map(key => key + '=' + (querystring[key] instanceof Date" +
+                return "?\" + Object.keys(querystring).filter(x => typeof querystring[x] === 'boolean' || typeof querystring[x] === 'number' ? true : querystring[x]).map(key => key + '=' + (querystring[key] instanceof Date" +
                        (supportMomentJs ? " || moment.isMoment(querystring[key])" : "") +
                        " ? querystring[key].toISOString() : querystring[key])).join('&') + \" ";
             }
