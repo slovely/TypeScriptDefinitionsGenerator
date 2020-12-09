@@ -259,7 +259,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             var methods = signalrHubs
                 .SelectMany(h => h.GetMethods()
                     .Where(m => m.IsPublic)
-                    .Where(m => m.DeclaringType == h || m.GetBaseDefinition()?.DeclaringType == h));
+                    .Where(m => m.GetBaseDefinition()?.DeclaringType == h));
             ProcessMethods(methods, generator);
 
             var clientInterfaceTypes = signalrHubs.Where(t => t.BaseType.IsGenericType)

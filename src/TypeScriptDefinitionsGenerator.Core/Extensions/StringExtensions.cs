@@ -11,7 +11,7 @@ namespace TypeScriptDefinitionsGenerator.Core.Extensions
 
         public static string[] GetTopLevelNamespaces(this string typeScriptType)
         {
-            var startIndex = typeScriptType.IndexOf("<") + 1;
+            var startIndex = typeScriptType.LastIndexOf("<") + 1;
             var count = typeScriptType.Length;
             if (startIndex > 0) count = typeScriptType.LastIndexOf(">") - startIndex;
             typeScriptType = typeScriptType.Substring(startIndex, count);
