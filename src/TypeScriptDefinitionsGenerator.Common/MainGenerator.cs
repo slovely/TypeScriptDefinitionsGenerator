@@ -350,7 +350,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             // Don't create the output if we don't have any hubs!
             if (allOutput.Length == 0) return;
 
-            File.WriteAllText(Path.Combine(_options.OutputFilePath, "hubs.d.ts"), allOutput.ToString());
+            File.WriteAllText(Path.Combine(_options.OutputFilePath, string.IsNullOrWhiteSpace(_options.HubsOutputFileName) ? "hubs.d.ts" : _options.HubsOutputFileName), allOutput.ToString());
         }
 
         public void GenerateWebApiActions()
