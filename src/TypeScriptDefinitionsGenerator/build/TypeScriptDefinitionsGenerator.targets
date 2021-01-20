@@ -76,11 +76,13 @@
       <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilename)</TsGenActionsFilename>
       <TsGenHubsFilename Condition="'$(TsGenHubsFilename)' != ''">--hubsOutputFileName $(TsGenHubsFilename)</TsGenHubsFilename>
       <TsGenApiExplicitOptIn Condition="'$(TsGenApiExplicitOptIn)' == 'true'">--actionsExplicitOptIn</TsGenApiExplicitOptIn>
+      <TsGenWrapClasses Condition="'$(TsGenWrapClasses)' != ''">--wrapenums $(TsGenWrapClasses)</TsGenWrapClasses>
+      <TsGenWrapEnums Condition="'$(TsGenWrapEnums)' != ''">--wrapenums $(TsGenWrapEnums)</TsGenWrapEnums>
       <TsGenMomentJsSupport Condition="'$(TsGenMomentJsSupport)' == 'true'">--supportMomentJs</TsGenMomentJsSupport>
 
       <SuppressServiceCallerParam Condition="'$(TsGenSuppressDefaultServiceCaller)' == 'true'">--suppressdefaultservicecaller</SuppressServiceCallerParam>
 
-      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename) $(TsGenHubsFilename) $(TsGenApiExplicitOptIn) $(TsGenMomentJsSupport)</ExecCmd>
+      <ExecCmd>&quot;$(MSBuildThisFileDirectory)TypeScriptDefinitionsGenerator.exe&quot; $(InputAssembliesParam) -o $(TsGenOutputFolder) $(WebApiParam) $(NamespacesParam) $(DebugParam) $(SuppressServiceCallerParam) --actionsstyle $(TsGenApiMethodStyle) $(TsGenAsModules) $(TsGenCamelCaseNames) $(TsGenServiceStackRequests) $(TsGenStringEnums) $(TsGenTemplateFolder) $(TsGenActionsFilename) $(TsGenHubsFilename) $(TsGenApiExplicitOptIn) $(TsGenMomentJsSupport) $(TsGenWrapClasses) $(TsGenWrapEnums)</ExecCmd>
     </PropertyGroup>
 
     <Message Text="TypeScriptGenerator Exec Command: $(ExecCmd)"></Message>
