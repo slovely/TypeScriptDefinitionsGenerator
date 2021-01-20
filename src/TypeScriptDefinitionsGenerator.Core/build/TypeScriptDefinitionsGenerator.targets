@@ -36,7 +36,7 @@
       <TsGenActionsFilename Condition="'$(TsGenActionsFilename)' != ''">--actionsOutputFileName $(TsGenActionsFilename)</TsGenActionsFilename>
       <TsGenHubsFilename Condition="'$(TsGenHubsFilename)' != ''">--hubsOutputFileName $(TsGenHubsFilename)</TsGenHubsFilename>
       <TsGenApiExplicitOptIn Condition="'$(TsGenApiExplicitOptIn)' == 'true'">--actionsExplicitOptIn</TsGenApiExplicitOptIn>
-      <TsGenWrapClasses Condition="'$(TsGenWrapClasses)' != ''">--wrapenums $(TsGenWrapClasses)</TsGenWrapClasses>
+      <TsGenWrapClasses Condition="'$(TsGenWrapClasses)' != ''">--wrapclasses $(TsGenWrapClasses)</TsGenWrapClasses>
       <TsGenWrapEnums Condition="'$(TsGenWrapEnums)' != ''">--wrapenums $(TsGenWrapEnums)</TsGenWrapEnums>
       <TsGenMomentJsSupport Condition="'$(TsGenMomentJsSupport)' == 'true'">--supportMomentJs</TsGenMomentJsSupport>
 
