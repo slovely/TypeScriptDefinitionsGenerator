@@ -37,6 +37,10 @@ namespace TypeScriptDefinitionsGenerator.Common
         public string ActionsOutputFileName { get; set; }
         [Option("hubsOutputFileName", HelpText = "Set the output filename for the hubs file.  Default: hubs.d.ts", DefaultValue = "hubs.d.ts")]
         public string HubsOutputFileName { get; set; }
+        [Option("wrapclasses", HelpText = "Optionally wrap the generated classes.ts in a module.  Default: do not wrap", DefaultValue = "")]
+        public string WrapClassesInModule { get; set; }
+        [Option("wrapenums", HelpText = "Optionally wrap the generated enums.ts in a module.  Default: do not wrap", DefaultValue = "")]
+        public string WrapEnumsInModule { get; set; }
         [Option("actionsExplicitOptIn", HelpText = "Whether API methods require opt-in attribute, or all are generated", DefaultValue = false)]
         public bool ActionsExplicitOptIn { get; set; }
         [Option("supportMomentJs", HelpText = "Whether generated code supports moment js dates", DefaultValue = false)]

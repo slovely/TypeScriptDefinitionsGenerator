@@ -158,6 +158,10 @@ namespace TypeScriptDefinitionsGenerator.Common
             {
                 tsEnumDefinitions = tsEnumDefinitions.Replace("module ", "export module ");
             }
+            if (!string.IsNullOrWhiteSpace(_options.WrapEnumsInModule))
+            {
+                tsEnumDefinitions = (_options.GenerateAsModules ? "export " : "") + "module " + _options.WrapEnumsInModule + " {\r\n" + tsEnumDefinitions + "\r\n}";
+            }
             if (_options.UseStringEnums)
             {
                 tsEnumDefinitions = Regex.Replace(tsEnumDefinitions, "\\b([a-zA-Z]*) = ([\\d]+)", "$1 = \"$1\"");
@@ -191,10 +195,14 @@ namespace TypeScriptDefinitionsGenerator.Common
                     return p.PropertyType is TsEnum ? "__Enums." + n : n;
                 });
                 var tsGeneratedCode = generator.Generate(TsGeneratorOutput.Properties | TsGeneratorOutput.Fields);
-                var tsClassDefinitions = "import * as __Enums from \"./enums\";\r\n\r\n";
+                var tsClassDefinitions = !string.IsNullOrWhiteSpace(_options.WrapEnumsInModule) ? "import {" + _options.WrapEnumsInModule + "  as __Enums} from \"./enums\";\r\n\r\n" : "import * as __Enums from \"./enums\";\r\n\r\n";
                 if (_options.SupportMomentJs)
                     tsClassDefinitions += "import {Moment} from \"moment\";\r\n";
+                if (!string.IsNullOrWhiteSpace(_options.WrapClassesInModule))
+                    tsClassDefinitions += "export module " + _options.WrapClassesInModule + " {\r\n";
                 tsClassDefinitions += tsGeneratedCode;
+                if (!string.IsNullOrWhiteSpace(_options.WrapClassesInModule))
+                    tsClassDefinitions += "}";
                 tsClassDefinitions = tsClassDefinitions.Replace("declare module", "export module");
                 tsClassDefinitions = tsClassDefinitions.Replace("interface", "export interface");
                 tsClassDefinitions = Regex.Replace(tsClassDefinitions, @":\s*System\.Collections\.Generic\.KeyValuePair\<(?<k>[^\,]+),(?<v>[^\,]+)\>\[\];",

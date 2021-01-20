@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TypeLite;
+using TypeScriptDefinitionsGenerator.Common;
 using TypeScriptDefinitionsGenerator.Common.SignalR;
 using TypeScriptDefinitionsGenerator.Core.Extensions;
 
@@ -10,6 +11,13 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
 {
     public class SignalRGenerator : BaseSignalRGenerator
     {
+        private readonly Options _options;
+
+        public SignalRGenerator(Options options)
+        {
+            _options = options;
+        }
+
         private const string HUB_TYPE = "Microsoft.AspNetCore.SignalR.Hub";
         public override bool IsHub(Type t)
         {
@@ -56,8 +64,14 @@ namespace TypeScriptDefinitionsGenerator.Core.SignalR
             // TODO: this isn't going to work if SignalR hubs are in more than one assembly.
             if (generateAsModules)
             {
-                var imports ="import Classes = require(\"./classes\");\r\n";
-                imports += "import * as __Enums from \"./enums\";\r\n";
+                var imports =
+                    string.IsNullOrWhiteSpace(_options.WrapClassesInModule)
+                        ? "import * as Classes from \"./classes\";\r\n"
+                        : "import {" + _options.WrapClassesInModule + " as Classes} from \"./classes\";\r\n";
+                imports +=
+                    string.IsNullOrWhiteSpace(_options.WrapEnumsInModule)
+                        ? "import * as __Enums from \"./enums\";\r\n"
+                        : "import {" + _options.WrapEnumsInModule + "  as __Enums} from \"./enums\";\r\n";
                 foreach (var ns in requiredClassImports)
                 {
                     imports += string.Format("import {0} = Classes.{0};\r\n", ns);

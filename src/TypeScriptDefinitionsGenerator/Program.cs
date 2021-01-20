@@ -45,7 +45,7 @@ namespace TypeScriptDefinitionsGenerator
                 var configuration = new GenerationConfiguration();
                 configuration.ControllerPredicate = t => typeof(ApiController).IsAssignableFrom(t);
                 configuration.ActionsPredicate = m => m.IsPublic;
-                configuration.SignalRGenerator = new SignalRGenerator();
+                configuration.SignalRGenerator = new SignalRGenerator(options);
                 configuration.GetActionParameters = GetActionParameters;
                 configuration.UrlGenerator = new WebApiUrlGenerator();
                 var mainGenerator = new MainGenerator(options, configuration);

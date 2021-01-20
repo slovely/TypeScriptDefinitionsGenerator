@@ -59,7 +59,7 @@ namespace TypeScriptDefinitionsGenerator.Core
                                       && !httpResponseMessageType.IsAssignableFrom(m.ReturnType)
                                       && !httpResponseMessageTypeTask.IsAssignableFrom(m.ReturnType);
                 };
-                configuration.SignalRGenerator = new SignalRGenerator();
+                configuration.SignalRGenerator = new SignalRGenerator(options);
                 configuration.GetActionParameters = WebApiUrlGenerator.GetActionParameters;
                 configuration.UrlGenerator = new WebApiUrlGenerator();
                 options.SupportMomentJs = true;

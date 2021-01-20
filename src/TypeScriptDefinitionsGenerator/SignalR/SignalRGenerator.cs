@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using TypeLite;
+using TypeScriptDefinitionsGenerator.Common;
 using TypeScriptDefinitionsGenerator.Common.SignalR;
 using TypeScriptDefinitionsGenerator.Extensions;
 
@@ -9,6 +10,13 @@ namespace TypeScriptDefinitionsGenerator.SignalR
 {
     public class SignalRGenerator : BaseSignalRGenerator
     {
+        private readonly Options _options;
+
+        public SignalRGenerator(Options options)
+        {
+            _options = options;
+        }
+
         private const string HUB_TYPE = "Microsoft.AspNet.SignalR.Hub";
         private const string IHUB_TYPE = "Microsoft.AspNet.SignalR.Hubs.IHub";
         public override bool IsHub(Type t)
