@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">netcoreapp2.0</TaskFolder>
     <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">net46</TaskFolder>
+    <TaskFolder Condition=" '$(TargetFramework)' == 'net6.0' ">net6.0</TaskFolder>
     <TaskAssembly>$(MSBuildThisFileDirectory)..\$(TaskFolder)\TypeScriptDefinitionsGenerator.BuildSupport.dll</TaskAssembly>
   </PropertyGroup>
 
