@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -23,10 +22,18 @@ namespace TypeScriptDefinitionsGenerator.BuildSupport
         {
             Parameter = "";
 
-            if (Values == null || !Values.Any()) return true;
+            if (Values == null || Values.Length == 0) return true;
 
+            // Removed LINQ statements here to work around an odd bug that causes the 
+            // build to fail when run from VS2022 (but fine from Rider / Command Line - go figure!)
             Parameter = ArgumentName + " ";
-            Parameter += string.Join(",", Values.Where(n => !string.IsNullOrWhiteSpace(n.ItemSpec)).Select(n => n.ItemSpec));
+            var valuesToJoin = new List<string>();
+            foreach (var value in Values)
+            {
+                if (string.IsNullOrWhiteSpace(value.ItemSpec)) continue;
+                valuesToJoin.Add(value.ItemSpec);
+            }
+            Parameter += string.Join(",", valuesToJoin);
             return true;
         }
     }
