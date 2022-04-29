@@ -10,7 +10,36 @@
   </PropertyGroup>
 
 
-  <UsingTask TaskName="TypeScriptDefinitionsGenerator.BuildSupport.CreateMulitpleParameterString" AssemblyFile="$(TaskAssembly)" />
+  <UsingTask
+          TaskName="CreateMulitpleParameterString"
+          TaskFactory="RoslynCodeTaskFactory"
+          AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <Values ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ArgumentName Required="true" />
+      <Parameter Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Collections.Generic" />
+
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            Parameter = "";
+
+            if (Values == null || Values.Length == 0) return true;
+
+            Parameter = ArgumentName + " ";
+            var valuesToJoin = new List<string>();
+            foreach (var value in Values)
+            {
+                if (string.IsNullOrWhiteSpace(value.ItemSpec)) continue;
+                valuesToJoin.Add(value.ItemSpec);
+            }
+            Parameter += string.Join(",", valuesToJoin);
+]]>
+      </Code>
+    </Task>
+  </UsingTask>
 
   <Target Name="AfterResolveReferences">
 
