@@ -13,8 +13,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp3.0' OR '$(TargetFramework)' == 'netcoreapp3.1'" Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Condition="'$(TargetFramework)' != 'netcoreapp3.0' AND '$(TargetFramework)' != 'netcoreapp3.0'" Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp3.0' OR '$(TargetFramework)' == 'netcoreapp3.1'" Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Condition="'$(TargetFramework)' != 'netcoreapp3.0' AND '$(TargetFramework)' != 'netcoreapp3.0'" Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="TypeLite" Version="1.8.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
