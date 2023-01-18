@@ -164,7 +164,7 @@ namespace TypeScriptDefinitionsGenerator.Common
             }
             if (_options.UseStringEnums)
             {
-                tsEnumDefinitions = Regex.Replace(tsEnumDefinitions, "\\b([a-zA-Z]*) = ([\\d]+)", "$1 = \"$1\"");
+                tsEnumDefinitions = Regex.Replace(tsEnumDefinitions, "\\b([a-zA-Z0-9_]*) = ([\\d]+)", "$1 = \"$1\"");
             }
             File.WriteAllText(Path.Combine(_options.OutputFilePath, "enums.ts"), tsEnumDefinitions);
 
